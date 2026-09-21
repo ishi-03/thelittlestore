@@ -1,5 +1,5 @@
 import axios from "axios";
-const API_URL = "http://localhost:5000/api";
+import { API_URL } from "../config/api.js";
 // Get all categories
 export const getCategories = async () => {
   const response = await axios.get(`${API_URL}/categories`);

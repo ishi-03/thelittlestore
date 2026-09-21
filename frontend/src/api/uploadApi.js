@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/upload";
-
+import { API_URL } from "../config/api.js";
 // files = FileList or array of File
 export const uploadImages = async (files, onProgress) => {
   const formData = new FormData();
