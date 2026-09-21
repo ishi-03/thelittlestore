@@ -14,8 +14,9 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: "https://thelittlestore.onrender.com"
+}));app.use(express.json());
 
 // Serve uploaded images statically -> http://localhost:5000/uploads/xyz.jpg
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -30,7 +31,6 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on ${PORT}`);
 });
