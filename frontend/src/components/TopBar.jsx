@@ -21,7 +21,7 @@ export default function TopBar() {
 
       <p className="text-xs text-[#6b6b6b] tracking-wide">
         Free Shipping on orders above{' '}
-        <strong className="font-semibold text-pink-dark">₹999</strong>
+        <strong className="font-semibold text-pink-dark">₹xxx</strong>
       </p>
     </div>
   );

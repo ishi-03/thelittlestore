@@ -19,8 +19,8 @@ export default function AboutPage() {
     },
     {
       icon: <Truck className="w-6 h-6" />,
-      title: "Free Shipping Over ₹999",
-      desc: "Because a cozy night's sleep shouldn't come with delivery anxiety. Free shipping on all orders above ₹999.",
+      title: "Free Shipping Over ₹xxx",
+      desc: "Because a cozy night's sleep shouldn't come with delivery anxiety. Free shipping on all orders above ₹xxx.",
     },
   ];
 

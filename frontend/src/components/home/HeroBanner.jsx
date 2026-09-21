@@ -145,7 +145,7 @@ export default function HeroBanner() {
               color: '#fff',
               backgroundColor: '#f4a7b9',
               border: 'none',
-              borderRadius: '999px',
+              borderRadius: 'xxxpx',
               padding: '0.75rem 1.8rem',
               cursor: 'pointer',
               boxShadow: '0 6px 20px rgba(244,167,185,0.45)',
@@ -261,7 +261,7 @@ export default function HeroBanner() {
               style={{
                 height: '8px',
                 width: i === cur ? '22px' : '8px',
-                borderRadius: '999px',
+                borderRadius: 'xxxpx',
                 border: 'none',
                 cursor: 'pointer',
                 backgroundColor: i === cur ? '#f4a7b9' : 'rgba(244,167,185,0.35)',
