@@ -19,8 +19,6 @@ app.use(cors({
 }));app.use(express.json());
 
 // Serve uploaded images statically -> http://localhost:5000/uploads/xyz.jpg
-// remove this line:
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/age-groups", ageGroupRoutes);

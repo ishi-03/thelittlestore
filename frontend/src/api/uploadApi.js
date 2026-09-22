@@ -1,6 +1,9 @@
 import axios from "axios";
 
 import { API_URL } from "../config/api.js";
+
+const UPLOAD_API = `${API_URL}/upload`;
+
 // files = FileList or array of File
 export const uploadImages = async (files, onProgress) => {
   const formData = new FormData();
@@ -9,7 +12,7 @@ export const uploadImages = async (files, onProgress) => {
     formData.append("images", file);
   });
 
-  const response = await axios.post(API_URL, formData, {
+  const response = await axios.post(UPLOAD_API, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -25,6 +28,6 @@ export const uploadImages = async (files, onProgress) => {
 };
 
 export const deleteImage = async (publicId) => {
-  const response = await axios.delete(`${API_URL}/${encodeURIComponent(publicId)}`);
+  const response = await axios.delete(`${UPLOAD_API}/${encodeURIComponent(publicId)}`);
   return response.data;
 };
