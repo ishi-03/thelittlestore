@@ -21,7 +21,7 @@ const SLIDES = [
     hl: 'Happy Babies',
     body: "Super soft nightsuits made for your little one's peaceful sleep.",
     cta: 'Shop Now',
-    img: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&q=80',
+    img: '/images/banner1.jpeg',
     imgAlt: 'Smiling baby in a soft white nightsuit with bunny toy',
   },
   {
@@ -30,7 +30,7 @@ const SLIDES = [
     hl: 'Sets for Babies',
     body: 'Curated bundles of our softest babywear — the perfect gift for new parents.',
     cta: 'Explore Gifts',
-    img: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80',
+    img: '/images/banner2.jpeg',
     imgAlt: 'Baby gift set',
   },
   {
@@ -39,7 +39,7 @@ const SLIDES = [
     hl: 'Sleep Suits',
     body: "Breathable, GOTS-certified organic cotton — gentle on baby's delicate skin.",
     cta: 'Shop Organic',
-    img: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
+    img: '/images/banner3.jpeg',
     imgAlt: 'Baby in organic cotton suit',
   },
 ];
