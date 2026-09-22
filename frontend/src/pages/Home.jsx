@@ -78,8 +78,13 @@ export default function Home() {
       <main className="flex-1 min-w-0">
         <HeroBanner />
         <AgeCategory />
-        <BestsellerGrid products={filteredProducts} />
-      </main>
+<BestsellerGrid
+  products={filteredProducts.map((p) => ({
+    ...p,
+    image: p.images?.[0],
+    bg: "#f8f3f0",
+  }))}
+/>      </main>
 
     </div>
   );
