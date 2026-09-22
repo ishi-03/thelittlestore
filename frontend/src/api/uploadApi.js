@@ -24,7 +24,7 @@ export const uploadImages = async (files, onProgress) => {
   return response.data.urls || [];
 };
 
-export const deleteImage = async (filename) => {
-  const response = await axios.delete(`${API_URL}/${filename}`);
+export const deleteImage = async (publicId) => {
+  const response = await axios.delete(`${API_URL}/${encodeURIComponent(publicId)}`);
   return response.data;
 };

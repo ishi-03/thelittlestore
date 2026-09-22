@@ -1,13 +1,17 @@
-import fs from "fs";
-import path from "path";
+import cloudinary from "../config/cloudinary.js";
 
-// Build full public URL for an uploaded file
-const buildUrl = (req, filename) => {
-  const base =
-    process.env.BASE_URL ||
-    `${req.protocol}://${req.get("host")}`;
-
-  return `${base}/uploads/${filename}`;
+// Upload a single buffer to Cloudinary via stream
+const uploadBufferToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "little-store" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    stream.end(buffer);
+  });
 };
 
 // POST /api/upload  (field name: "images", max 5 files)
@@ -19,7 +23,11 @@ export const uploadImages = async (req, res) => {
       });
     }
 
-    const urls = req.files.map((file) => buildUrl(req, file.filename));
+    const results = await Promise.all(
+      req.files.map((file) => uploadBufferToCloudinary(file.buffer))
+    );
+
+    const urls = results.map((r) => r.secure_url);
 
     res.status(201).json({ urls });
   } catch (error) {
@@ -29,20 +37,18 @@ export const uploadImages = async (req, res) => {
   }
 };
 
-// DELETE /api/upload/:filename
+// DELETE /api/upload/:publicId (URL-encoded, e.g. little-store%2Fabc123)
 export const deleteImage = async (req, res) => {
   try {
-    const filename = path.basename(req.params.filename);
+    const publicId = decodeURIComponent(req.params.publicId);
 
-    const filePath = path.join(process.cwd(), "uploads", filename);
+    const result = await cloudinary.uploader.destroy(publicId);
 
-    if (!fs.existsSync(filePath)) {
+    if (result.result !== "ok") {
       return res.status(404).json({
         message: "Image not found",
       });
     }
-
-    fs.unlinkSync(filePath);
 
     res.status(200).json({
       message: "Image deleted successfully",

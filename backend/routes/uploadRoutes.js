@@ -36,6 +36,5 @@ const handleUpload = (req, res, next) => {
 };
 
 router.post("/", handleUpload, uploadImages);
-router.delete("/:filename", deleteImage);
-
+router.delete("/:publicId", deleteImage);
 export default router;
