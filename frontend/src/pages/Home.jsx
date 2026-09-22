@@ -3,6 +3,7 @@ import FilterSidebar from '../components/home/FilterSidebar.jsx';
 import HeroBanner from '../components/home/HeroBanner.jsx';
 import AgeCategory from '../components/home/AgeCategory.jsx';
 import { BestsellerGrid } from '../components/ProductCard.jsx';
+import { getProducts } from '../api/productApi.js';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -14,8 +15,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
-      .then((res) => res.json())
+    getProducts()
       .then((data) => setProducts(data))
       .catch((err) => console.log(err));
   }, []);
