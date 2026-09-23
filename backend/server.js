@@ -14,11 +14,26 @@ connectDB();
 
 const app = express();
 
-app.use(cors({
-  origin: "https://thelittlestore.onrender.com"
-}));app.use(express.json());
+const allowedOrigins = [
+  "https://thelittlestore.onrender.com",
+  "http://localhost:5173",
+];
 
-// Serve uploaded images statically -> http://localhost:5000/uploads/xyz.jpg
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/age-groups", ageGroupRoutes);

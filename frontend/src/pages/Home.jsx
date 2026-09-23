@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FilterSidebar from '../components/home/FilterSidebar.jsx';
 import HeroBanner from '../components/home/HeroBanner.jsx';
 import AgeCategory from '../components/home/AgeCategory.jsx';
@@ -6,6 +7,7 @@ import { BestsellerGrid } from '../components/ProductCard.jsx';
 import { getProducts } from '../api/productApi.js';
 
 export default function Home() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
 
   const [filters, setFilters] = useState({
@@ -14,12 +16,20 @@ export default function Home() {
     colors: [],
   });
 
-  useEffect(() => {
-    getProducts()
-      .then((data) => setProducts(data))
-      .catch((err) => console.log(err));
-  }, []);
+  // Quick-filter pill: sort by newest (from the "New Arrivals" icon)
+  const [sortNewest, setSortNewest] = useState(false);
 
+  useEffect(() => {
+  getProducts()
+    .then((data) => {
+      console.log("PRODUCT API RESPONSE:", data);
+      setProducts(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => {
+      console.log(err);
+      setProducts([]);
+    });
+}, []);
   // Dynamic filter options from MongoDB
   const categories = [
     ...new Set(products.map((p) => p.category).filter(Boolean))
@@ -40,7 +50,7 @@ export default function Home() {
   ];
 
   // Filter products
-  const filteredProducts = products.filter((product) => {
+  let filteredProducts = products.filter((product) => {
     const categoryMatch =
       filters.categories.length === 0 ||
       filters.categories.includes(product.category);
@@ -62,6 +72,35 @@ export default function Home() {
     );
   });
 
+  // "New Arrivals" pill: sort the same grid by newest instead of navigating away
+  if (sortNewest) {
+    filteredProducts = [...filteredProducts].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  }
+
+  // Handles clicks from the AgeCategory pills on this page
+  const handleQuickFilter = (label) => {
+    if (label === "Gift Sets") {
+      // Gift Sets gets its own page — navigate there
+      navigate("/gift-sets");
+      return;
+    }
+
+    if (label === "New Arrivals") {
+      setSortNewest((prev) => !prev);
+      return;
+    }
+
+    // Age pills (0-6, 6-12, 12-18, 18-24 Months): filter in place, no navigation
+    setFilters((prev) => ({
+      ...prev,
+      ages: prev.ages.includes(label)
+        ? prev.ages.filter((a) => a !== label)
+        : [...prev.ages, label],
+    }));
+  };
+
   return (
     <div className="flex items-start gap-5 max-w-[1200px] mx-auto px-5 md:px-6 my-6">
 
@@ -77,7 +116,11 @@ export default function Home() {
 
       <main className="flex-1 min-w-0">
         <HeroBanner />
-        <AgeCategory />
+        <AgeCategory
+          activeAges={filters.ages}
+          activeNewest={sortNewest}
+          onSelect={handleQuickFilter}
+        />
 <BestsellerGrid
   products={filteredProducts.map((p) => ({
     ...p,

@@ -24,6 +24,7 @@ const LEFT_LINKS = [
 
 const RIGHT_LINKS = [
   { label: 'Shop',        to: '/shop'        },
+  { label: 'Gift Sets',   to: '/gift-sets'   },
   { label: 'Collections', to: '/collections' },
 ];
 

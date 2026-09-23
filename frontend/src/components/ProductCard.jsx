@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 
 export default function ProductCard({ product }) {
   const [wished, setWished] = useState(false);
   const { name, price, bg, image } = product;
+  const navigate = useNavigate();
 
   return (
     <article
+      onClick={() => navigate(`/product/${product._id}`)}
       onMouseEnter={e => {
         e.currentTarget.style.transform = 'translateY(-4px)';
         e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';

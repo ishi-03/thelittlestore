@@ -22,11 +22,11 @@ export default function ContactPage() {
     },
     {
       q: "Are your fabrics safe for newborns?",
-      a: "Absolutely. All our fabrics are OEKO-TEX certified — free from harmful substances and tested for sensitive skin.",
+      a: "Absolutely. All our fabrics are free from harmful substances and tested for sensitive skin.",
     },
     {
       q: "Do you offer bulk or gifting orders?",
-      a: "We love baby showers! Reach out to us at hello@thelittlestore.in for custom gifting and bulk order discounts.",
+      a: "We love baby showers! Reach out to us at surangibanka@gmail.com for custom gifting and bulk order discounts.",
     },
   ];
 
@@ -64,8 +64,8 @@ export default function ContactPage() {
               <p className="text-xs tracking-[0.2em] uppercase text-[#F9A8B8] font-medium mb-5">Contact Details</p>
               <div className="flex flex-col gap-4">
                 {[
-                  { icon: <Mail className="w-4 h-4" />, label: "Email", val: "hello@thelittlestore.in" },
-                  { icon: <Phone className="w-4 h-4" />, label: "WhatsApp", val: "+91 98765 43210" },
+                  { icon: <Mail className="w-4 h-4" />, label: "Email", val: "surangibanka@gmail.com" },
+                  { icon: <Phone className="w-4 h-4" />, label: "WhatsApp", val: "+91 98927 34880" },
                   { icon: <MapPin className="w-4 h-4" />, label: "Studio", val: "Mumbai, Gujarat, India" },
                   { icon: <Clock className="w-4 h-4" />, label: "Hours", val: "Mon–Sat, 10am – 6pm" },
                 ].map((c) => (

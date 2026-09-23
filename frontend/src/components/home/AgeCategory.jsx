@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
 const CATS = [
   {
@@ -46,21 +45,19 @@ const CATS = [
   },
 ];
 
-export default function AgeCategory() {
-  const navigate = useNavigate();
+export default function AgeCategory({
+  activeAges = [],
+  activeNewest = false,
+  onSelect,
+}) {
+  const isActive = (label) => {
+    if (label === "New Arrivals") return activeNewest;
+    if (label === "Gift Sets") return false; // navigates away, never "active"
+    return activeAges.includes(label);
+  };
 
   const handleCategoryClick = (label) => {
-    if (label === "Gift Sets") {
-      navigate("/products?category=Gift%20Set");
-      return;
-    }
-
-    if (label === "New Arrivals") {
-      navigate("/products?sort=newest");
-      return;
-    }
-
-    navigate(`/products?age=${encodeURIComponent(label)}`);
+    onSelect?.(label);
   };
 
   return (
@@ -72,47 +69,54 @@ export default function AgeCategory() {
           msOverflowStyle: "none",
         }}
       >
-        {CATS.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => handleCategoryClick(cat.label)}
-            className="
-              flex flex-col items-center gap-2.5 shrink-0
-              hover:-translate-y-1
-              transition-transform duration-200
-            "
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            {/* Pastel circle */}
-            <span
-              className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
-              style={{
-                backgroundColor: cat.bg,
-              }}
-            >
-              {React.cloneElement(cat.icon, {
-                stroke: cat.stroke,
-              })}
-            </span>
+        {CATS.map((cat) => {
+          const active = isActive(cat.label);
 
-            {/* Label */}
-            <span
+          return (
+            <button
+              key={cat.id}
+              onClick={() => handleCategoryClick(cat.label)}
+              className="
+                flex flex-col items-center gap-2.5 shrink-0
+                hover:-translate-y-1
+                transition-transform duration-200
+              "
               style={{
-                fontFamily: '"Nunito", sans-serif',
-                fontSize: "0.72rem",
-                fontWeight: 500,
-                color: "#6b6b6b",
-                whiteSpace: "nowrap",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              {cat.label}
-            </span>
-          </button>
-        ))}
+              {/* Pastel circle */}
+              <span
+                className="w-[72px] h-[72px] rounded-full flex items-center justify-center transition-all duration-200"
+                style={{
+                  backgroundColor: cat.bg,
+                  boxShadow: active
+                    ? `0 0 0 2.5px ${cat.stroke}`
+                    : "none",
+                }}
+              >
+                {React.cloneElement(cat.icon, {
+                  stroke: cat.stroke,
+                })}
+              </span>
+
+              {/* Label */}
+              <span
+                style={{
+                  fontFamily: '"Nunito", sans-serif',
+                  fontSize: "0.72rem",
+                  fontWeight: active ? 700 : 500,
+                  color: active ? "#2d2d2d" : "#6b6b6b",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {cat.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );
