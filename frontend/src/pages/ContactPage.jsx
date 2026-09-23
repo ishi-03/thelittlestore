@@ -1,6 +1,11 @@
 import { Heart, Truck, Mail, Phone, MapPin, Camera, Globe , Clock, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
+const WHATSAPP_NUMBER = "919892734880";
+const CONTACT_EMAIL = "surangibanka@gmail.com";
+const whatsappLink = (message) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -8,7 +13,16 @@ export default function ContactPage() {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = () => {
-    if (form.name && form.email && form.message) setSubmitted(true);
+    if (form.name && form.email && form.message) {
+      const text =
+        `New enquiry from website\n\n` +
+        `Name: ${form.name}\n` +
+        `Email: ${form.email}\n` +
+        (form.subject ? `Subject: ${form.subject}\n` : "") +
+        `Message: ${form.message}`;
+      window.open(whatsappLink(text), "_blank", "noopener,noreferrer");
+      setSubmitted(true);
+    }
   };
 
   const faqs = [
@@ -64,24 +78,41 @@ export default function ContactPage() {
               <p className="text-xs tracking-[0.2em] uppercase text-[#F9A8B8] font-medium mb-5">Contact Details</p>
               <div className="flex flex-col gap-4">
                 {[
-                  { icon: <Mail className="w-4 h-4" />, label: "Email", val: "surangibanka@gmail.com" },
-                  { icon: <Phone className="w-4 h-4" />, label: "WhatsApp", val: "+91 98927 34880" },
+                  { icon: <Mail className="w-4 h-4" />, label: "Email", val: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+                  { icon: <Phone className="w-4 h-4" />, label: "WhatsApp", val: "+91 98927 34880", href: whatsappLink("Hi! I have a question about The Little Store.") },
                   { icon: <MapPin className="w-4 h-4" />, label: "Studio", val: "Mumbai, Gujarat, India" },
                   { icon: <Clock className="w-4 h-4" />, label: "Hours", val: "Mon–Sat, 10am – 6pm" },
-                ].map((c) => (
-                  <div
-                    key={c.label}
-                    className="flex items-start gap-4 bg-white rounded-2xl p-4 border border-[#F5EDE9] shadow-sm"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-[#FDE8EC] flex items-center justify-center text-[#F9A8B8] shrink-0">
-                      {c.icon}
+                ].map((c) => {
+                  const content = (
+                    <>
+                      <div className="w-9 h-9 rounded-xl bg-[#FDE8EC] flex items-center justify-center text-[#F9A8B8] shrink-0">
+                        {c.icon}
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#8B7355] mb-0.5">{c.label}</p>
+                        <p className="text-sm font-medium text-[#2D2D2D]">{c.val}</p>
+                      </div>
+                    </>
+                  );
+                  return c.href ? (
+                    <a
+                      key={c.label}
+                      href={c.href}
+                      target={c.href.startsWith("http") ? "_blank" : undefined}
+                      rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                      className="flex items-start gap-4 bg-white rounded-2xl p-4 border border-[#F5EDE9] shadow-sm hover:border-[#F9A8B8] transition-colors"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div
+                      key={c.label}
+                      className="flex items-start gap-4 bg-white rounded-2xl p-4 border border-[#F5EDE9] shadow-sm"
+                    >
+                      {content}
                     </div>
-                    <div>
-                      <p className="text-xs text-[#8B7355] mb-0.5">{c.label}</p>
-                      <p className="text-sm font-medium text-[#2D2D2D]">{c.val}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -95,9 +126,14 @@ export default function ContactPage() {
                 <p className="text-xs text-[#166534] opacity-80 leading-relaxed mb-3">
                   Fastest replies! Most queries answered within an hour.
                 </p>
-                <button className="bg-[#22C55E] text-white text-xs font-medium px-4 py-2 rounded-full hover:bg-[#16a34a] transition-colors">
+                <a
+                  href={whatsappLink("Hi! I have a question about The Little Store.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-[#22C55E] text-white text-xs font-medium px-4 py-2 rounded-full hover:bg-[#16a34a] transition-colors"
+                >
                   Open WhatsApp →
-                </button>
+                </a>
               </div>
             </div>
 
@@ -106,17 +142,30 @@ export default function ContactPage() {
               <p className="text-xs tracking-[0.2em] uppercase text-[#F9A8B8] font-medium mb-4">Follow Along</p>
               <div className="flex gap-3">
                 {[
-                  { icon: <Camera className="w-4 h-4" />, label: "@thelittlestore" },
+                  { icon: <Camera className="w-4 h-4" />, label: "@thelittlestore", href: "https://www.instagram.com/thelittlestore_kids" },
                   { icon: <Globe  className="w-4 h-4" />, label: "thelittlestore" },
-                ].map((s) => (
-                  <button
-                    key={s.label}
-                    className="flex items-center gap-2 bg-white border border-[#F5EDE9] rounded-full px-4 py-2 text-sm text-[#8B7355] hover:border-[#F9A8B8] hover:text-[#F9A8B8] transition-colors shadow-sm"
-                  >
-                    {s.icon}
-                    <span className="text-xs">{s.label}</span>
-                  </button>
-                ))}
+                ].map((s) =>
+                  s.href ? (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 bg-white border border-[#F5EDE9] rounded-full px-4 py-2 text-sm text-[#8B7355] hover:border-[#F9A8B8] hover:text-[#F9A8B8] transition-colors shadow-sm"
+                    >
+                      {s.icon}
+                      <span className="text-xs">{s.label}</span>
+                    </a>
+                  ) : (
+                    <button
+                      key={s.label}
+                      className="flex items-center gap-2 bg-white border border-[#F5EDE9] rounded-full px-4 py-2 text-sm text-[#8B7355] hover:border-[#F9A8B8] hover:text-[#F9A8B8] transition-colors shadow-sm"
+                    >
+                      {s.icon}
+                      <span className="text-xs">{s.label}</span>
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>

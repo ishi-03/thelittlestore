@@ -8,7 +8,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
  *   • Pink announcement bar at top
  *   • Logo: thin weight "the little store" in Cormorant Garamond (elegant serif) — centered
  *   • Left links: Home, About Us, Contact
- *   • Right links: Shop, Collections + icons (search, user, cart)
+ *   • Right links: Shop,  + icons (search, user, cart)
  *   • Nav links: Nunito, medium weight, active = pink underline
  *   • White bg, very subtle bottom border
  *
@@ -25,7 +25,6 @@ const LEFT_LINKS = [
 const RIGHT_LINKS = [
   { label: 'Shop',        to: '/shop'        },
   { label: 'Gift Sets',   to: '/gift-sets'   },
-  { label: 'Collections', to: '/collections' },
 ];
 
 export default function Navbar() {
