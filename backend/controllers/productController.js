@@ -43,6 +43,7 @@ export const createProduct = async (req, res) => {
       images,
       color,
       price,
+      weightGrams,
       variants,
       isActive,
     } = req.body;
@@ -82,6 +83,7 @@ export const createProduct = async (req, res) => {
       images,
       color,
       price,
+      weightGrams,
       variants,
       isActive,
     });
@@ -105,6 +107,7 @@ export const updateProduct = async (req, res) => {
       images,
       color,
       price,
+      weightGrams,
       variants,
       isActive,
     } = req.body;
@@ -139,6 +142,7 @@ export const updateProduct = async (req, res) => {
         images,
         color,
         price,
+        weightGrams,
         variants,
         isActive,
       },

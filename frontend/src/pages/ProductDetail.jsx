@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProductById } from "../api/productApi.js";
+import { useCart } from "../context/CartContext.jsx";
+import { useFavorites } from "../context/FavoritesContext.jsx";
 
 const PINK = "#f4a7b9";
 const DARK = "#2d2d2d";
@@ -62,6 +64,8 @@ export default function ProductDetail() {
   const [activeImg, setActiveImg] = useState(0);
   const [selectedAge, setSelectedAge] = useState(null);
   const [qty, setQty] = useState(1);
+  const { addItem } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   useEffect(() => {
     setLoading(true);
@@ -123,6 +127,8 @@ export default function ProductDetail() {
   const selectedVariant = product.variants?.find((v) => v.age === selectedAge);
   const inStock = selectedVariant ? selectedVariant.stock > 0 : true;
   const stockCount = selectedVariant?.stock;
+  const handleAddToCart = () => addItem(product, selectedVariant, qty);
+  const wished = isFavorite(product._id);
 
   return (
     <div style={{ background: "#fdfbf9", fontFamily: '"Nunito", sans-serif' }}>
@@ -187,9 +193,35 @@ export default function ProductDetail() {
 
         {/* ── Details ── */}
         <div>
-          <h1 style={{ fontSize: "26px", fontWeight: 800, color: DARK, margin: "0 0 8px" }}>
-            {product.name}
-          </h1>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+            <h1 style={{ fontSize: "26px", fontWeight: 800, color: DARK, margin: "0 0 8px" }}>
+              {product.name}
+            </h1>
+            <button
+              onClick={() => toggleFavorite(product._id)}
+              aria-label={wished ? "Remove from favorites" : "Add to favorites"}
+              aria-pressed={wished}
+              style={{
+                flexShrink: 0,
+                width: "38px",
+                height: "38px",
+                borderRadius: "50%",
+                border: `1px solid ${BORDER}`,
+                background: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24"
+                fill={wished ? PINK : "none"}
+                stroke={wished ? PINK : "#c0b0b0"}
+                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          </div>
 
           {product.category && (
             <p style={{ fontSize: "12.5px", letterSpacing: "0.06em", textTransform: "uppercase", color: MUTED, margin: "0 0 16px" }}>
@@ -261,6 +293,7 @@ export default function ProductDetail() {
             </div>
             <button
               disabled={!inStock}
+              onClick={handleAddToCart}
               style={{
                 flex: 1,
                 background: inStock ? DARK : "#c4b9b2",

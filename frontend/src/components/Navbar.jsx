@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext.jsx';
+import { useFavorites } from '../context/FavoritesContext.jsx';
 
 /**
  * Navbar — "The Little Store"
@@ -29,6 +31,9 @@ const RIGHT_LINKS = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { totalCount } = useCart();
+  const { count: favCount } = useFavorites();
 
   return (
     <header
@@ -175,9 +180,30 @@ export default function Navbar() {
           <IconBtn>
             <UserIcon />
           </IconBtn>
+          {/* Favorites */}
+          <div className="relative">
+            <IconBtn onClick={() => navigate('/favorites')} label="Favorites">
+              <HeartIcon />
+            </IconBtn>
+            {favCount > 0 && (
+              <span
+                className="absolute top-0.5 right-0.5 flex items-center justify-center rounded-full text-white"
+                style={{
+                  width: '15px',
+                  height: '15px',
+                  fontSize: '0.5rem',
+                  fontWeight: 700,
+                  backgroundColor: '#f4a7b9',
+                  fontFamily: '"Nunito", sans-serif',
+                }}
+              >
+                {favCount > 99 ? '99+' : favCount}
+              </span>
+            )}
+          </div>
           {/* Cart */}
           <div className="relative">
-            <IconBtn>
+            <IconBtn onClick={() => navigate('/cart')} label="Cart">
               <CartIcon />
             </IconBtn>
             <span
@@ -191,7 +217,7 @@ export default function Navbar() {
                 fontFamily: '"Nunito", sans-serif',
               }}
             >
-              0
+              {totalCount > 99 ? '99+' : totalCount}
             </span>
           </div>
         </div>
@@ -232,10 +258,12 @@ export default function Navbar() {
 }
 
 /* ── Reusable icon button ───────────────────────────── */
-function IconBtn({ children }) {
+function IconBtn({ children, onClick, label }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
+      onClick={onClick}
+      aria-label={label}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200"
@@ -289,6 +317,15 @@ function CartIcon() {
       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
       <line x1="3" y1="6" x2="21" y2="6"/>
       <path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor"
+      strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
     </svg>
   );
 }

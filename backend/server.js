@@ -7,6 +7,9 @@ import productRoutes from "./routes/productRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import ageGroupRoutes from "./routes/ageGroupRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import { razorpayWebhook } from "./controllers/paymentController.js";
 
 dotenv.config();
 
@@ -32,12 +35,17 @@ app.use(
   })
 );
 
+// Razorpay webhook needs the raw body for signature check, so it goes before express.json()
+app.post("/api/payment/webhook", express.raw({ type: "application/json" }), razorpayWebhook);
+
 app.use(express.json());
 
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/age-groups", ageGroupRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend Running");

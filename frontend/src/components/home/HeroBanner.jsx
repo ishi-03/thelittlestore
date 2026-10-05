@@ -169,7 +169,7 @@ export default function HeroBanner() {
           className="flex-1 relative overflow-hidden"
           style={{ minHeight: '280px' }}
         >
-          {/* Baby photo — fills the entire right half */}
+          {/* Baby photo  */}
           <img
             key={s.img}
             src={s.img}

@@ -35,6 +35,13 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
+    // Packed weight in grams (used for shipping). Empty = default weight from .env
+    weightGrams: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
+
     variants: [
       {
         age: {

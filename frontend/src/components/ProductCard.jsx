@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useFavorites } from '../context/FavoritesContext.jsx';
 
 
 
 export default function ProductCard({ product }) {
-  const [wished, setWished] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const wished = isFavorite(product._id);
   const { name, price, bg, image } = product;
   const navigate = useNavigate();
 
@@ -52,8 +54,9 @@ export default function ProductCard({ product }) {
 
         {/* Heart button */}
         <button
-          onClick={e => { e.stopPropagation(); setWished(w => !w); }}
+          onClick={e => { e.stopPropagation(); toggleFavorite(product._id); }}
           aria-label="Wishlist"
+          aria-pressed={wished}
           onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.12)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           style={{

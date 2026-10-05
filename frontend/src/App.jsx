@@ -12,6 +12,9 @@ import Contact from './pages/ContactPage.jsx'
 import Products from "./pages/admin/Products.jsx";
 import Categories from "./pages/admin/Categories.jsx";
 import AgeGroups from "./pages/admin/AgeGroups.jsx";
+import Cart from './pages/Cart.jsx'
+import Favorites from './pages/Favorites.jsx'
+
 
 function App() {
   return (
@@ -22,9 +25,11 @@ function App() {
         <Route path="/"            element={<Home />} />
         <Route path="/shop"        element={<Shop />} />
         <Route path="/gift-sets"   element={<GiftSets />} />
-        {/* <Route path="/product/:id" element={<ProductDetail />} /> */}
+        <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/about"       element={<About />} />
         <Route path="/contact"     element={<Contact />} />
+        <Route path="/cart"        element={<Cart />} />
+        <Route path="/favorites"   element={<Favorites />} />
         <Route path="/admin/products" element={<Products />} />
         <Route path="/admin/categories" element={<Categories />} />
         <Route path="/admin/age-groups" element={<AgeGroups />} />
