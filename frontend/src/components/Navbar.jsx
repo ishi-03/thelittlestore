@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useIsAdmin, adminLogout } from '../api/adminAuth.js';
 import { useCart } from '../context/CartContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 
@@ -34,6 +35,21 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { totalCount } = useCart();
   const { count: favCount } = useFavorites();
+  const isAdmin = useIsAdmin();
+  const [userMenu, setUserMenu] = useState(false);
+
+  const logout = () => {
+    adminLogout();
+    setUserMenu(false);
+    setMenuOpen(false);
+    navigate('/');
+  };
+
+  const menuItem = {
+    display: 'block', width: '100%', textAlign: 'left', padding: '9px 14px',
+    background: 'none', border: 'none', cursor: 'pointer',
+    fontFamily: '"Nunito", sans-serif', fontSize: '0.85rem', fontWeight: 600, color: '#2d2d2d',
+  };
 
   return (
     <header
@@ -51,7 +67,7 @@ export default function Navbar() {
 
       {/* ── Main navbar ──────────────────────────────── */}
       <div
-        className="grid grid-cols-3 items-center px-8 md:px-12 h-[72px]"
+        className="grid grid-cols-3 items-center px-3 sm:px-8 md:px-12 h-[72px]"
         style={{
           backgroundColor: '#ffffff',
           borderBottom: '1px solid #f0e8e0',
@@ -173,13 +189,39 @@ export default function Navbar() {
           </nav>
 
           {/* Search */}
-          <IconBtn>
-            <SearchIcon />
-          </IconBtn>
-          {/* User */}
-          <IconBtn>
-            <UserIcon />
-          </IconBtn>
+          <div className="hidden md:block">
+            <IconBtn>
+              <SearchIcon />
+            </IconBtn>
+          </div>
+          {/* User: guests go to admin login, admins get Admin Panel / Logout */}
+          <div className="relative">
+            <IconBtn
+              label={isAdmin ? 'Admin menu' : 'Admin login'}
+              onClick={() => (isAdmin ? setUserMenu((o) => !o) : navigate('/admin/login'))}
+            >
+              <UserIcon />
+            </IconBtn>
+            {isAdmin && (
+              <span
+                className="absolute top-1 right-1 rounded-full"
+                style={{ width: '8px', height: '8px', backgroundColor: '#3fa66b', border: '1.5px solid #fff' }}
+              />
+            )}
+            {isAdmin && userMenu && (
+              <div
+                className="absolute right-0 mt-2 rounded-xl overflow-hidden"
+                style={{ top: '100%', minWidth: '170px', background: '#fff', border: '1px solid #f0e8e0', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 60 }}
+              >
+                <button style={menuItem} onClick={() => { setUserMenu(false); navigate('/admin'); }}>
+                  Admin Panel
+                </button>
+                <button style={{ ...menuItem, color: '#d9534f', borderTop: '1px solid #f0e8e0' }} onClick={logout}>
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
           {/* Favorites */}
           <div className="relative">
             <IconBtn onClick={() => navigate('/favorites')} label="Favorites">
@@ -250,6 +292,34 @@ export default function Navbar() {
                 </NavLink>
               </li>
             ))}
+            <li>
+              {isAdmin ? (
+                <>
+                  <button
+                    onClick={() => { setMenuOpen(false); navigate('/admin'); }}
+                    className="w-full text-left px-3 py-2 rounded-lg block"
+                    style={{ fontSize: '0.875rem', fontWeight: 600, color: '#f4a7b9' }}
+                  >
+                    Admin Panel
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-3 py-2 rounded-lg block"
+                    style={{ fontSize: '0.875rem', fontWeight: 600, color: '#d9534f' }}
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => { setMenuOpen(false); navigate('/admin/login'); }}
+                  className="w-full text-left px-3 py-2 rounded-lg block"
+                  style={{ fontSize: '0.875rem', fontWeight: 500, color: '#6b6b6b' }}
+                >
+                  Admin Login
+                </button>
+              )}
+            </li>
           </ul>
         </nav>
       )}

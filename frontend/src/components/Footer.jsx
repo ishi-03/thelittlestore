@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 /**
  * Footer
@@ -43,9 +44,15 @@ export default function Footer() {
           <ul className="flex flex-col gap-2">
             {SHOP_LINKS.map(l => (
               <li key={l}>
-                <a href="#" className="text-xs text-[#6b6b6b] hover:text-pink-dark transition-colors">
-                  {l}
-                </a>
+                {l === 'Track Order' ? (
+                  <Link to="/track-order" className="text-xs text-[#6b6b6b] hover:text-pink-dark transition-colors">
+                    {l}
+                  </Link>
+                ) : (
+                  <a href="#" className="text-xs text-[#6b6b6b] hover:text-pink-dark transition-colors">
+                    {l}
+                  </a>
+                )}
               </li>
             ))}
           </ul>

@@ -9,6 +9,8 @@ import ageGroupRoutes from "./routes/ageGroupRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import { razorpayWebhook } from "./controllers/paymentController.js";
 
 dotenv.config();
@@ -46,6 +48,8 @@ app.use("/api/age-groups", ageGroupRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", dashboardRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend Running");

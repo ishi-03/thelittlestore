@@ -3,10 +3,67 @@ import { useNavigate } from "react-router-dom";
 import { getProducts } from "../api/productApi.js";
 import ProductCard from "../components/ProductCard.jsx";
 import { useFavorites } from "../context/FavoritesContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
 
 const PINK = "#f4a7b9";
 const DARK = "#2d2d2d";
 const MUTED = "#8a7f7a";
+
+// Card + "Add to cart" (with size picker when the product has variants) + Remove
+function FavoriteItem({ product }) {
+  const { addItem } = useCart();
+  const { toggleFavorite } = useFavorites();
+  const variants = product.variants || [];
+  const firstInStock = variants.find((v) => Number(v.stock) > 0);
+  const [variantId, setVariantId] = useState(firstInStock ? String(firstInStock._id) : "");
+
+  const unavailable = product.isActive === false || (variants.length > 0 && !firstInStock);
+  const selected = variants.find((v) => String(v._id) === variantId) || null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <ProductCard hideCart product={{ ...product, image: product.images?.[0], bg: "#f8f3f0" }} />
+
+      {variants.length > 0 && !unavailable && (
+        <select
+          value={variantId}
+          onChange={(e) => setVariantId(e.target.value)}
+          style={{ width: "100%", padding: "8px 10px", border: "1px solid #e8ddd5", borderRadius: "8px", background: "#fff", fontFamily: '"Nunito", sans-serif', fontSize: "13px", color: DARK }}
+        >
+          {variants.map((v) => (
+            <option key={v._id} value={String(v._id)} disabled={!(Number(v.stock) > 0)}>
+              {v.age}{Number(v.stock) > 0 ? "" : " (out of stock)"}
+            </option>
+          ))}
+        </select>
+      )}
+
+      <button
+        disabled={unavailable}
+        onClick={() => addItem(product, selected, 1)}
+        style={{
+          background: unavailable ? "#f2d9df" : PINK,
+          color: "#fff",
+          border: "none",
+          borderRadius: "8px",
+          padding: "10px",
+          fontFamily: '"Nunito", sans-serif',
+          fontSize: "13px",
+          fontWeight: 700,
+          cursor: unavailable ? "not-allowed" : "pointer",
+        }}
+      >
+        {unavailable ? "Out of stock" : "ADD TO CART"}
+      </button>
+      <button
+        onClick={() => toggleFavorite(product._id)}
+        style={{ background: "none", border: "none", color: MUTED, fontSize: "12.5px", fontWeight: 600, textDecoration: "underline", cursor: "pointer", padding: 0 }}
+      >
+        Remove from favorites
+      </button>
+    </div>
+  );
+}
 
 export default function Favorites() {
   const navigate = useNavigate();
@@ -86,10 +143,7 @@ export default function Favorites() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {favorites.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={{ ...product, image: product.images?.[0], bg: "#f8f3f0" }}
-              />
+              <FavoriteItem key={product._id} product={product} />
             ))}
           </div>
         )}

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getProducts } from "../api/productApi.js";
 import { useCart } from "../context/CartContext.jsx";
-import { useToast } from "../context/ToastContext.jsx";
 
 const PINK = "#f4a7b9";
 const DARK = "#2d2d2d";
@@ -149,8 +148,7 @@ function CartLine({ item, onQty, onRemove }) {
 
 export default function Cart() {
   const navigate = useNavigate();
-  const toast = useToast();
-  const { items, subtotal, hasUnavailable, updateQuantity, removeItem, syncWithProducts } = useCart();
+  const { items, subtotal, hasUnavailable, updateQuantity, removeItem, clearCart, syncWithProducts } = useCart();
 
   const [syncing, setSyncing] = useState(items.length > 0);
   const [syncFailed, setSyncFailed] = useState(false);
@@ -212,7 +210,17 @@ export default function Cart() {
   return (
     <div style={{ background: "#fdfbf9", fontFamily: '"Nunito", sans-serif' }}>
       <div className="max-w-[1100px] mx-auto px-5 md:px-8 py-8">
-        <h1 style={{ fontSize: "24px", fontWeight: 800, color: DARK, margin: "0 0 4px" }}>Your Cart</h1>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px" }}>
+          <h1 style={{ fontSize: "24px", fontWeight: 800, color: DARK, margin: "0 0 4px" }}>Your Cart</h1>
+          <button
+            onClick={() => {
+              if (window.confirm("Remove all items from your cart?")) clearCart();
+            }}
+            style={{ background: "none", border: "none", color: MUTED, fontSize: "13px", fontWeight: 600, textDecoration: "underline", cursor: "pointer", padding: 0, marginBottom: "4px" }}
+          >
+            Clear cart
+          </button>
+        </div>
         <div style={{ width: "40px", height: "3px", background: PINK, borderRadius: "2px", marginBottom: "18px" }} />
 
         {syncFailed && (
@@ -257,7 +265,7 @@ export default function Cart() {
             )}
             <button
               disabled={syncing || hasUnavailable || subtotal <= 0}
-              onClick={() => toast.info("Checkout is coming in the next step")}
+              onClick={() => navigate("/checkout")}
               style={{
                 width: "100%",
                 background: syncing || hasUnavailable ? "#f2d9df" : PINK,

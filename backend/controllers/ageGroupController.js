@@ -1,4 +1,5 @@
 import AgeGroup from "../models/AgeGroups.js";
+import Product from "../models/Product.js";
 
 // Defaults that get seeded once, only if collection is empty
 const defaultAgeGroups = [
@@ -41,6 +42,16 @@ export const getAgeGroups = async (req, res) => {
   }
 };
 
+// GET ALL AGE GROUPS (admin, includes inactive)
+export const getAllAgeGroups = async (req, res) => {
+  try {
+    const ageGroups = await AgeGroup.find().sort({ order: 1, createdAt: 1 });
+    res.status(200).json(ageGroups);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // CREATE AGE GROUP
 export const createAgeGroup = async (req, res) => {
   try {
@@ -80,6 +91,13 @@ export const updateAgeGroup = async (req, res) => {
   try {
     const { label, order, isActive } = req.body;
 
+    const before = await AgeGroup.findById(req.params.id);
+    if (!before) {
+      return res.status(404).json({
+        message: "Age group not found",
+      });
+    }
+
     const ageGroup = await AgeGroup.findByIdAndUpdate(
       req.params.id,
       {
@@ -97,6 +115,15 @@ export const updateAgeGroup = async (req, res) => {
       return res.status(404).json({
         message: "Age group not found",
       });
+    }
+
+    // variants store the age label as text, keep them in sync on rename
+    if (ageGroup.label !== before.label) {
+      await Product.updateMany(
+        { "variants.age": before.label },
+        { $set: { "variants.$[v].age": ageGroup.label } },
+        { arrayFilters: [{ "v.age": before.label }] }
+      );
     }
 
     res.status(200).json(ageGroup);

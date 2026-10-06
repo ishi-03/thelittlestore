@@ -14,6 +14,13 @@ import Categories from "./pages/admin/Categories.jsx";
 import AgeGroups from "./pages/admin/AgeGroups.jsx";
 import Cart from './pages/Cart.jsx'
 import Favorites from './pages/Favorites.jsx'
+import Checkout from './pages/Checkout.jsx'
+import TrackOrder from './pages/TrackOrder.jsx'
+import OrderSuccess from './pages/OrderSuccess.jsx'
+import AdminGuard from './components/admin/AdminGuard.jsx'
+import AdminLogin from './pages/admin/Login.jsx'
+import AdminOrders from './pages/admin/Orders.jsx'
+import AdminDashboard from './pages/admin/Dashboard.jsx'
 
 
 function App() {
@@ -30,9 +37,15 @@ function App() {
         <Route path="/contact"     element={<Contact />} />
         <Route path="/cart"        element={<Cart />} />
         <Route path="/favorites"   element={<Favorites />} />
-        <Route path="/admin/products" element={<Products />} />
-        <Route path="/admin/categories" element={<Categories />} />
-        <Route path="/admin/age-groups" element={<AgeGroups />} />
+        <Route path="/checkout"    element={<Checkout />} />
+        <Route path="/track-order" element={<TrackOrder />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+        <Route path="/admin/products" element={<AdminGuard><Products /></AdminGuard>} />
+        <Route path="/admin/categories" element={<AdminGuard><Categories /></AdminGuard>} />
+        <Route path="/admin/age-groups" element={<AdminGuard><AgeGroups /></AdminGuard>} />
+        <Route path="/admin/orders" element={<AdminGuard><AdminOrders /></AdminGuard>} />
       </Routes>
       <Footer />
     </div>

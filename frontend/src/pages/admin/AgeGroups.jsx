@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  getAgeGroups,
+  getAllAgeGroups as getAgeGroups,
   createAgeGroup,
+  updateAgeGroup,
   deleteAgeGroup,
 } from "../../api/ageGroupApi";
 
@@ -52,6 +53,21 @@ const AgeGroups = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUpdate = async (ageGroup, changes) => {
+    try {
+      await updateAgeGroup(ageGroup._id, changes);
+      await fetchAgeGroups();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to update age group");
+    }
+  };
+
+  const handleRename = (ageGroup) => {
+    const next = window.prompt("Rename age group", ageGroup.label);
+    if (next === null || !next.trim() || next.trim() === ageGroup.label) return;
+    handleUpdate(ageGroup, { label: next.trim() });
   };
 
   const handleDelete = async (id) => {
@@ -118,14 +134,33 @@ const AgeGroups = () => {
             >
               <span className="font-medium text-gray-700">
                 {ageGroup.label}
+                {ageGroup.isActive === false && (
+                  <span className="ml-2 text-xs text-gray-400">(Inactive)</span>
+                )}
               </span>
 
-              <button
-                onClick={() => handleDelete(ageGroup._id)}
-                className="text-red-500 text-sm"
-              >
-                Delete
-              </button>
+              <div className="flex items-center gap-4 text-sm">
+                <button
+                  onClick={() => handleRename(ageGroup)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() =>
+                    handleUpdate(ageGroup, { isActive: ageGroup.isActive === false })
+                  }
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  {ageGroup.isActive === false ? "Activate" : "Deactivate"}
+                </button>
+                <button
+                  onClick={() => handleDelete(ageGroup._id)}
+                  className="text-red-500"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}

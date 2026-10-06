@@ -1,9 +1,12 @@
 import Product from "../models/Product.js";
+import { isAdminRequest } from "../middleware/adminAuth.js";
 
 // GET ALL PRODUCTS
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    // shoppers only see active products; the admin panel (valid token) sees everything
+    const filter = isAdminRequest(req) ? {} : { isActive: { $ne: false } };
+    const products = await Product.find(filter).sort({ createdAt: -1 });
 
     res.status(200).json(products);
   } catch (error) {
@@ -18,7 +21,7 @@ export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (!product) {
+    if (!product || (product.isActive === false && !isAdminRequest(req))) {
       return res.status(404).json({
         message: "Product not found",
       });

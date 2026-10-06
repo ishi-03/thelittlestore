@@ -22,3 +22,9 @@ export const deleteAgeGroup = async (id) => {
   const response = await axios.delete(`${AGE_GROUP_API}/${id}`);
   return response.data;
 };
+
+// Admin: all age groups including inactive
+export const getAllAgeGroups = async () => {
+  const response = await axios.get(`${AGE_GROUP_API}/admin/all`);
+  return response.data;
+};

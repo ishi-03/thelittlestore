@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import upload from "../middleware/upload.js";
+import { requireAdmin } from "../middleware/adminAuth.js";
 import {
   uploadImages,
   deleteImage,
@@ -35,6 +36,6 @@ const handleUpload = (req, res, next) => {
   });
 };
 
-router.post("/", handleUpload, uploadImages);
-router.delete("/:publicId", deleteImage);
+router.post("/", requireAdmin, handleUpload, uploadImages);
+router.delete("/:publicId", requireAdmin, deleteImage);
 export default router;

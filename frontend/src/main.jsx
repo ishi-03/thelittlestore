@@ -5,6 +5,7 @@ import App from './App'
 import { ToastProvider } from './context/ToastContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
+import './api/adminAuth.js'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(

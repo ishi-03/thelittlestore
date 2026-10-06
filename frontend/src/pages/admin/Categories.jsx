@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
-  getCategories,
+  getAllCategories as getCategories,
   createCategory,
+  updateCategory,
   deleteCategory,
 } from "../../api/categoryApi";
 
@@ -62,6 +63,27 @@ const Categories = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Rename / activate / deactivate
+  const handleUpdate = async (category, changes) => {
+    try {
+      const updated = await updateCategory(category._id, changes);
+      setCategories((prev) =>
+        prev.map((c) => (c._id === updated._id ? updated : c))
+      );
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Failed to update category"
+      );
+    }
+  };
+
+  const handleRename = (category) => {
+    const name = window.prompt("Rename category", category.name);
+    if (name === null || !name.trim() || name.trim() === category.name) return;
+    handleUpdate(category, { name: name.trim() });
   };
 
   // Delete category
@@ -156,16 +178,35 @@ const Categories = () => {
               >
                 <span className="text-gray-700 font-medium">
                   {category.name}
+                  {category.isActive === false && (
+                    <span className="ml-2 text-xs text-gray-400">(Inactive)</span>
+                  )}
                 </span>
 
-                <button
-                  onClick={() =>
-                    handleDelete(category._id)
-                  }
-                  className="text-red-500 hover:text-red-600 font-medium"
-                >
-                  Delete
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleRename(category)}
+                    className="text-gray-500 hover:text-gray-700 font-medium"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleUpdate(category, { isActive: category.isActive === false })
+                    }
+                    className="text-gray-500 hover:text-gray-700 font-medium"
+                  >
+                    {category.isActive === false ? "Activate" : "Deactivate"}
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleDelete(category._id)
+                    }
+                    className="text-red-500 hover:text-red-600 font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

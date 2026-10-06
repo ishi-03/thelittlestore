@@ -1,7 +1,9 @@
 import express from "express";
+import { requireAdmin } from "../middleware/adminAuth.js";
 
 import {
   getAgeGroups,
+  getAllAgeGroups,
   createAgeGroup,
   updateAgeGroup,
   deleteAgeGroup,
@@ -10,8 +12,9 @@ import {
 const router = express.Router();
 
 router.get("/", getAgeGroups);
-router.post("/", createAgeGroup);
-router.put("/:id", updateAgeGroup);
-router.delete("/:id", deleteAgeGroup);
+router.get("/admin/all", requireAdmin, getAllAgeGroups);
+router.post("/", requireAdmin, createAgeGroup);
+router.put("/:id", requireAdmin, updateAgeGroup);
+router.delete("/:id", requireAdmin, deleteAgeGroup);
 
 export default router;

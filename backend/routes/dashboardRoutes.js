@@ -1,10 +1,9 @@
 import express from "express";
-import { adminLogin, adminMe } from "../controllers/authController.js";
+import { getDashboardStats } from "../controllers/dashboardController.js";
 import { requireAdmin } from "../middleware/adminAuth.js";
 
 const router = express.Router();
 
-router.post("/login", adminLogin);
-router.get("/me", requireAdmin, adminMe);
+router.get("/stats", requireAdmin, getDashboardStats);
 
 export default router;
