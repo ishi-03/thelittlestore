@@ -62,6 +62,13 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    // Where the product shows up on the store (multiple allowed):
+    // "global" = main Shop/Home, "women-wear" = Women Wear page, "twinning" = Twinning Sets page
+    placements: {
+      type: [{ type: String, enum: ["global", "women-wear", "twinning"] }],
+      default: ["global"],
+    },
   },
   { timestamps: true }
 );

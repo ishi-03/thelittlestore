@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import dotenv from "dotenv";
 import path from "path";
 import connectDB from "./config/db.js";
@@ -18,6 +19,10 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Render sits behind a proxy; needed so rate limiting sees the real client IP
+app.set("trust proxy", 1);
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 const allowedOrigins = [
   "https://thelittlestore.onrender.com",

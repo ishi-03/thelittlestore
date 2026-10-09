@@ -5,6 +5,14 @@ import HeroBanner from '../components/home/HeroBanner.jsx';
 import AgeCategory from '../components/home/AgeCategory.jsx';
 import { BestsellerGrid } from '../components/ProductCard.jsx';
 import { getProducts } from '../api/productApi.js';
+import {
+  HomeStyles,
+  HomeHero,
+  TrustMarquee,
+  CollectionTiles,
+  PromiseSection,
+  GiftCta,
+} from '../components/home/HomeSections.jsx';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -20,7 +28,7 @@ export default function Home() {
   const [sortNewest, setSortNewest] = useState(false);
 
   useEffect(() => {
-  getProducts()
+  getProducts("global")
     .then((data) => {
       console.log("PRODUCT API RESPONSE:", data);
       setProducts(Array.isArray(data) ? data : []);
@@ -102,33 +110,52 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-start gap-5 max-w-[1200px] mx-auto px-5 md:px-6 my-6">
+    <div>
+      <HomeStyles />
+      <HomeHero />
+      <TrustMarquee />
+      <CollectionTiles />
 
-      <div className="hidden md:block">
-        <FilterSidebar
-          filters={filters}
-          setFilters={setFilters}
-          categories={categories}
-          ages={ages}
-          colors={colors}
-        />
-      </div>
+      {/* Shop: filters + quick picks + product grid (same behaviour as before) */}
+      <section className="hm-products">
+        <div className="hm-head">
+          <span className="hm-pill">Shop</span>
+          <h2 className="hm-serif hm-h2">Find the perfect fit</h2>
+          <p className="hm-sub">Filter by age, colour or category — or tap a quick pick below.</p>
+        </div>
 
-      <main className="flex-1 min-w-0">
-        <HeroBanner />
-        <AgeCategory
-          activeAges={filters.ages}
-          activeNewest={sortNewest}
-          onSelect={handleQuickFilter}
-        />
-<BestsellerGrid
-  products={filteredProducts.map((p) => ({
-    ...p,
-    image: p.images?.[0],
-    bg: "#f8f3f0",
-  }))}
-/>      </main>
+        <div className="flex items-start gap-5 max-w-[1200px] mx-auto px-5 md:px-6">
 
+          <div className="hidden md:block">
+            <FilterSidebar
+              filters={filters}
+              setFilters={setFilters}
+              categories={categories}
+              ages={ages}
+              colors={colors}
+            />
+          </div>
+
+          <main className="flex-1 min-w-0">
+            <AgeCategory
+              activeAges={filters.ages}
+              activeNewest={sortNewest}
+              onSelect={handleQuickFilter}
+            />
+            <BestsellerGrid
+              products={filteredProducts.map((p) => ({
+                ...p,
+                image: p.images?.[0],
+                bg: "#f8f3f0",
+              }))}
+            />
+          </main>
+
+        </div>
+      </section>
+
+      <PromiseSection />
+      <GiftCta />
     </div>
   );
 }

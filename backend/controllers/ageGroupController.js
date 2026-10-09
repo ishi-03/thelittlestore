@@ -106,7 +106,7 @@ export const updateAgeGroup = async (req, res) => {
         ...(isActive !== undefined ? { isActive } : {}),
       },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     );

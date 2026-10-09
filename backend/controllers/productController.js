@@ -1,11 +1,31 @@
 import Product from "../models/Product.js";
 import { isAdminRequest } from "../middleware/adminAuth.js";
 
-// GET ALL PRODUCTS
+const PLACEMENTS = ["global", "women-wear", "twinning"];
+
+// placements must be a non-empty array of known values
+const isValidPlacements = (placements) =>
+  Array.isArray(placements) &&
+  placements.length > 0 &&
+  placements.every((p) => PLACEMENTS.includes(p));
+
+// GET ALL PRODUCTS  (optional ?placement=global|women-wear|twinning)
 export const getProducts = async (req, res) => {
   try {
     // shoppers only see active products; the admin panel (valid token) sees everything
     const filter = isAdminRequest(req) ? {} : { isActive: { $ne: false } };
+
+    const { placement } = req.query;
+    if (placement === "global") {
+      // old products saved before placements existed count as global
+      filter.$or = [
+        { placements: "global" },
+        { placements: { $exists: false } },
+        { placements: { $size: 0 } },
+      ];
+    } else if (PLACEMENTS.includes(placement)) {
+      filter.placements = placement;
+    }
     const products = await Product.find(filter).sort({ createdAt: -1 });
 
     res.status(200).json(products);
@@ -49,12 +69,19 @@ export const createProduct = async (req, res) => {
       weightGrams,
       variants,
       isActive,
+      placements,
     } = req.body;
 
     // Basic validation
     if (!name || !category || price === undefined) {
       return res.status(400).json({
         message: "Name, category and price are required",
+      });
+    }
+
+    if (placements !== undefined && !isValidPlacements(placements)) {
+      return res.status(400).json({
+        message: "Select at least one valid placement (global, women-wear, twinning)",
       });
     }
 
@@ -89,6 +116,7 @@ export const createProduct = async (req, res) => {
       weightGrams,
       variants,
       isActive,
+      placements,
     });
 
     res.status(201).json(product);
@@ -113,7 +141,14 @@ export const updateProduct = async (req, res) => {
       weightGrams,
       variants,
       isActive,
+      placements,
     } = req.body;
+
+    if (placements !== undefined && !isValidPlacements(placements)) {
+      return res.status(400).json({
+        message: "Select at least one valid placement (global, women-wear, twinning)",
+      });
+    }
 
     // Validate variants
     if (variants && Array.isArray(variants)) {
@@ -148,9 +183,10 @@ export const updateProduct = async (req, res) => {
         weightGrams,
         variants,
         isActive,
+        placements,
       },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       }
     );

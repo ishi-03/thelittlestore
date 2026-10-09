@@ -211,7 +211,7 @@ export function BestsellerGrid({ products }) {  return (
           fontFamily: '"Nunito", sans-serif', fontWeight: 800,
           fontSize: '1.25rem', color: '#2d2d2d', margin: 0,
         }}>Shop Our Bestsellers</h2>
-        <a href="#" style={{
+        <a href="/shop" style={{
           fontFamily: '"Nunito", sans-serif', fontWeight: 600,
           fontSize: '0.85rem', color: '#f4a7b9', textDecoration: 'none',
           display: 'flex', alignItems: 'center', gap: '3px',
@@ -223,7 +223,11 @@ export function BestsellerGrid({ products }) {  return (
           </svg>
         </a>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px' }}>
+      <style>{`
+        @media (max-width: 1024px) { .bs-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+        @media (max-width: 640px)  { .bs-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; } }
+      `}</style>
+      <div className="bs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px' }}>
 {products.map((p) => (
   <ProductCard key={p._id} product={p} />
 ))}      </div>

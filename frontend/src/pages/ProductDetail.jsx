@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getProductById } from "../api/productApi.js";
 import { useCart } from "../context/CartContext.jsx";
 import { useFavorites } from "../context/FavoritesContext.jsx";
+import { SizeGuideTable } from "../components/SizeGuide.jsx";
 
 const PINK = "#f4a7b9";
 const DARK = "#2d2d2d";
@@ -350,6 +351,9 @@ export default function ProductDetail() {
           <div>
             <Accordion title="Description" defaultOpen>
               {product.description || "No description available for this product yet."}
+            </Accordion>
+            <Accordion title="Size Guide">
+              <SizeGuideTable />
             </Accordion>
             <Accordion title="Shipping Information">
               Orders are processed within 1-2 business days. Free shipping across India on orders over ₹999.

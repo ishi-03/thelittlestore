@@ -9,6 +9,12 @@ import { getCategories } from "../../api/categoryApi";
 import { getAgeGroups } from "../../api/ageGroupApi";
 import { uploadImages } from "../../api/uploadApi";
 
+const PLACEMENT_OPTIONS = [
+  { value: "global", label: "Global (main Shop & Home)" },
+  { value: "women-wear", label: "Women Wear page" },
+  { value: "twinning", label: "Twinning Sets page" },
+];
+
 const emptyForm = {
   name: "",
   price: "",
@@ -17,6 +23,7 @@ const emptyForm = {
   color: "",
   images: [],
   isActive: true,
+  placements: ["global"],
   variants: [{ age: "", stock: "" }],
 };
 
@@ -103,6 +110,15 @@ const Products = () => {
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const togglePlacement = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      placements: prev.placements.includes(value)
+        ? prev.placements.filter((p) => p !== value)
+        : [...prev.placements, value],
     }));
   };
 
@@ -199,6 +215,10 @@ const Products = () => {
       color: product.color || "",
       images: product.images || [],
       isActive: product.isActive !== false,
+      placements:
+        product.placements && product.placements.length > 0
+          ? product.placements
+          : ["global"],
       variants:
         product.variants && product.variants.length > 0
           ? product.variants.map((variant) => ({
@@ -234,6 +254,11 @@ const Products = () => {
       return;
     }
 
+    if (formData.placements.length === 0) {
+      alert("Select at least one placement (Global / Women Wear / Twinning).");
+      return;
+    }
+
     const duplicateAge =
       new Set(formData.variants.map((v) => v.age)).size !==
       formData.variants.length;
@@ -251,6 +276,7 @@ const Products = () => {
       color: formData.color,
       images: formData.images,
       isActive: formData.isActive,
+      placements: formData.placements,
       variants: formData.variants.map((variant) => ({
         age: variant.age,
         stock: Number(variant.stock),
@@ -840,6 +866,31 @@ const Products = () => {
                     className="w-full border rounded-lg px-3 py-2"
                     placeholder="Describe your product..."
                   />
+                </div>
+
+                {/* Placements */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium mb-2">
+                    Show this product on
+                    <span className="text-gray-400"> (select one or more)</span>
+                  </label>
+
+                  <div className="flex flex-wrap gap-x-6 gap-y-2">
+                    {PLACEMENT_OPTIONS.map((opt) => (
+                      <label
+                        key={opt.value}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.placements.includes(opt.value)}
+                          onChange={() => togglePlacement(opt.value)}
+                          className="w-4 h-4 accent-pink-400"
+                        />
+                        {opt.label}
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Active */}

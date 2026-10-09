@@ -64,7 +64,7 @@ export default function Shop() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
-    getProducts()
+    getProducts("global")
       .then((data) => {
         setProducts(data);
         setLoading(false);

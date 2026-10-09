@@ -127,7 +127,7 @@ export async function finalizePayment({ razorpayOrderId, razorpayPaymentId, paid
   const intent = await PaymentIntent.findOneAndUpdate(
     { razorpayOrderId, status: { $in: ["created", "failed"] } },
     { $set: { status: "processing", razorpayPaymentId } },
-    { new: true }
+    { returnDocument: "after" }
   );
 
   if (!intent) {

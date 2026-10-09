@@ -20,14 +20,16 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
  */
 
 const LEFT_LINKS = [
-  { label: 'Home',     to: '/'        },
-  { label: 'About Us', to: '/about'   },
-  { label: 'Contact',  to: '/contact' },
+  { label: 'Home',       to: '/'           },
+  { label: 'Shop',       to: '/shop'       },
+  { label: 'Women Wear', to: '/women-wear' },
+  { label: 'Twinning',   to: '/twinning'   },
 ];
 
 const RIGHT_LINKS = [
-  { label: 'Shop',        to: '/shop'        },
   { label: 'Gift Sets',   to: '/gift-sets'   },
+  { label: 'About Us',    to: '/about'       },
+  { label: 'Contact',     to: '/contact'     },
 ];
 
 export default function Navbar() {
@@ -67,7 +69,7 @@ export default function Navbar() {
 
       {/* ── Main navbar ──────────────────────────────── */}
       <div
-        className="grid grid-cols-3 items-center px-3 sm:px-8 md:px-12 h-[72px]"
+        className="grid grid-cols-[1fr_auto_1fr] items-center px-3 sm:px-8 md:px-12 h-[72px]"
         style={{
           backgroundColor: '#ffffff',
           borderBottom: '1px solid #f0e8e0',
@@ -91,6 +93,7 @@ export default function Navbar() {
                 cursor: 'pointer',
                 textDecoration: 'none',
                 display: 'inline-block',
+                whiteSpace: 'nowrap',
               })}
             >
               {({ isActive }) => (
@@ -166,6 +169,7 @@ export default function Navbar() {
                   cursor: 'pointer',
                   textDecoration: 'none',
                   display: 'inline-block',
+                whiteSpace: 'nowrap',
                 })}
               >
                 {({ isActive }) => (

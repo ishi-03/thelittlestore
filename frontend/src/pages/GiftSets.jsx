@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getProducts } from "../api/productApi.js";
 import ProductCard from "../components/ProductCard.jsx";
 
 /**
  * GiftSets — "The Little Store"
  * ──────────────────────────────
- * Editorial, photo-led landing page for the "Gift Sets" quick-filter icon
- * on Home — full-bleed hero, alternating story sections, colorful "why us"
- * photo cards. Nunito font, existing brand colors (pink/lavender/cream)
- * kept, made bolder + more colorful throughout.
+ * Photo-led landing page for the "Gift Sets" quick-filter icon on Home.
+ * Fonts: Nunito (body, existing brand font) + Fraunces (soft serif for headings).
  *
- * IMAGES — drop files into /public/images with these exact names and they
- * show up automatically, no code changes needed. Until then everything
- * falls back to your existing banner photos so the page never breaks:
- *   - gift-hero.jpg        → full-width hero photo
- *   - gift-story-1.jpg     → "Perfect for Birthdays" section photo
- *   - gift-story-2.jpg     → "Bulk & Celebration Orders" section photo
- *   - gift-why-1.jpg / gift-why-2.jpg / gift-why-3.jpg
- *                          → the 3 colorful "why our gift sets" photo cards
+ * HERO VIDEO — put your video at:  /public/images/hero_video.mp4
+ * (poster / fallback photo: /images/gift-hero.jpg or .jpeg)
+ *
+ * OTHER IMAGES — drop files into /public/images with these names and they show
+ * up automatically. Until then everything falls back to existing photos:
+ *   - gift-hero.jpg / gift-hero.jpeg → hero poster + fallback if video fails
+ *   - giftStory1.jpeg                → "Return gifts" section photo
+ *   - gift-story-2.jpg               → "Bulk orders" section photo
+ *   - gift-why-1.jpg / gift-why-2.jpg → "why our gift sets" photos
  */
 
 const WHATSAPP_NUMBER = "919892734880";
@@ -29,7 +28,7 @@ const WHY_CARDS = [
     img: "/images/gift-why-1.jpg",
     fallback: "/images/why1.jpeg",
     tint: "#fde8ee",
-    accent: "#e0839b",
+    accent: "#c9627e",
     title: "Loved By Kids & Parents",
     body: "Soft, skin-friendly fabrics that feel as good as they look — parent-approved, kid-adored.",
   },
@@ -37,7 +36,7 @@ const WHY_CARDS = [
     img: "/images/why3.jpeg",
     fallback: "/images/why3.jpeg",
     tint: "#f5f0d4",
-    accent: "#b8952e",
+    accent: "#8f7218",
     title: "Bulk & Return-Gift Ready",
     body: "Planning a birthday or baby shower? Get special pricing on bulk gift-set orders.",
   },
@@ -45,16 +44,24 @@ const WHY_CARDS = [
     img: "/images/gift-why-2.jpg",
     fallback: "/images/why2.jpeg",
     tint: "#e8e0f5",
-    accent: "#9b82c8",
+    accent: "#7a5fb0",
     title: "Beautifully Gift-Wrapped",
     body: "Every set arrives ribboned and boxed — ready to hand over, no extra wrapping needed.",
   },
  
 ];
 
+// Image frame shapes for the three "why" cards: arch, soft square, inverted arch
+const WHY_SHAPES = [
+  "999px 999px 28px 28px",
+  "28px",
+  "28px 28px 999px 999px",
+];
+
 export default function GiftSets() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const heroVideoRef = useRef(null);
 
   useEffect(() => {
     getProducts()
@@ -66,349 +73,316 @@ export default function GiftSets() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Autoplay the hero video silently; stay paused for people who prefer reduced motion
+  useEffect(() => {
+    const v = heroVideoRef.current;
+    if (!v) return;
+    v.muted = true;
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      v.pause();
+    } else {
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    }
+  }, []);
+
   const giftProducts = products.filter((p) =>
     p.category?.toLowerCase().includes("gift")
   );
 
   return (
-    <div style={{ fontFamily: '"Nunito", sans-serif', overflowX: "hidden" }}>
+    <div className="gs-root">
       <style>{`
-        @keyframes giftFadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&display=swap');
+
+        .gs-root { font-family: "Nunito", sans-serif; color: #3a2b34; overflow-x: hidden; }
+        .gs-serif { font-family: "Fraunces", Georgia, serif; font-weight: 600; letter-spacing: -0.015em; }
+
+        /* ── motion ── */
+        @keyframes gsRise {
+          from { opacity: 0; transform: translateY(22px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes giftFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%      { transform: translateY(-10px); }
+        @keyframes gsFloat {
+          0%, 100% { transform: translateY(0) rotate(10deg); }
+          50%      { transform: translateY(-8px) rotate(10deg); }
         }
-        .gift-fade-up { animation: giftFadeUp 0.7s ease both; }
-        .gift-float   { animation: giftFloat 3.6s ease-in-out infinite; }
-        .gift-why-img { transition: transform .4s ease; }
-        .gift-why-card:hover .gift-why-img { transform: scale(1.07); }
-        .gift-cta-btn { transition: background .2s, transform .2s; }
+        .gs-rise { opacity: 0; animation: gsRise 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+        .gs-float { animation: gsFloat 4s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .gs-rise { opacity: 1; animation: none; }
+          .gs-float { animation: none; transform: rotate(10deg); }
+          .gs-why-img { transition: none !important; }
+        }
+
+        /* ── buttons ── */
+        .gs-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          font-family: "Nunito", sans-serif; font-weight: 800; font-size: 0.95rem;
+          border: none; border-radius: 999px; padding: 0.9rem 2rem;
+          cursor: pointer; text-decoration: none; white-space: nowrap;
+          transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        .gs-btn:hover { transform: translateY(-2px); }
+        .gs-btn:focus-visible { outline: 3px solid #7a5fb0; outline-offset: 3px; }
+        .gs-btn-pink  { color: #fff; background: linear-gradient(135deg, #e58aa3, #c9627e); box-shadow: 0 10px 24px rgba(201,98,126,0.38); }
+        .gs-btn-glass { color: #fff; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .gs-btn-glass:hover { background: rgba(255,255,255,0.28); }
+        .gs-btn-hero:focus-visible { outline-color: #fff; }
+        .gs-btn-amber { color: #fff; background: #c4642c; box-shadow: 0 10px 22px rgba(196,100,44,0.30); }
+        .gs-btn-white { color: #b8486a; background: #fff; box-shadow: 0 8px 20px rgba(58,43,52,0.18); }
+
+        /* ── hero ── */
+        .gs-hero { position: relative; width: 100%; height: min(86vh, 720px); min-height: 540px; display: flex; align-items: flex-end; overflow: hidden; background: #3a2b34; }
+        .gs-hero-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+        .gs-hero-shade {
+          position: absolute; inset: 0;
+          background:
+            linear-gradient(90deg, rgba(34,22,30,0.50) 0%, rgba(34,22,30,0.12) 62%, rgba(34,22,30,0) 100%),
+            linear-gradient(180deg, rgba(58,43,52,0.10) 0%, rgba(58,43,52,0.18) 38%, rgba(30,19,27,0.82) 100%);
+        }
+        .gs-hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+        .gs-hero-pill {
+          display: inline-flex; align-items: center; gap: 8px; margin-bottom: 1.2rem;
+          padding: 0.45rem 1rem; border-radius: 999px; font-weight: 700; font-size: 0.82rem; color: #fff;
+          background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.45);
+          backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .gs-hero-pill i { width: 7px; height: 7px; border-radius: 50%; background: #f5d87a; display: inline-block; }
+        .gs-hero-h1 { font-size: clamp(2.5rem, 6.2vw, 4.6rem); line-height: 1.04; color: #fff; margin: 0 0 1.1rem; max-width: 780px; text-shadow: 0 2px 22px rgba(0,0,0,0.25); }
+        .gs-hero-h1 em { font-style: italic; font-weight: 600; color: #fde8ee; }
+        .gs-hero-p { font-size: 1.05rem; font-weight: 500; color: #fff7f2; max-width: 500px; line-height: 1.7; margin: 0 0 2rem; }
+        .gs-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+        /* ── trust strip ── */
+        .gs-strip { background: #fff; border-bottom: 1px solid #f3e4e4; }
+        .gs-strip-inner { max-width: 1200px; margin: 0 auto; padding: 20px 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 48px; }
+        .gs-strip-item { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.92rem; color: #5b4852; }
+        .gs-strip-item svg { flex: none; }
+
+        /* ── shared layout ── */
+        .gs-wrap { max-width: 1200px; margin: 0 auto; padding: 96px 24px; display: flex; align-items: center; gap: 80px; }
+        .gs-col { flex: 1 1 0; min-width: 0; }
+        .gs-pill { display: inline-block; font-weight: 800; font-size: 0.82rem; padding: 0.4rem 1rem; border-radius: 999px; margin-bottom: 1.2rem; }
+        .gs-h2 { font-size: clamp(2rem, 3.8vw, 3.05rem); line-height: 1.1; margin: 0 0 1.2rem; }
+        .gs-lead { font-size: 1.02rem; line-height: 1.85; max-width: 460px; margin: 0 0 2rem; }
+
+        /* ── story 1: return gifts ── */
+        .gs-story1 { position: relative; overflow: hidden; background: linear-gradient(160deg, #fff4ea 0%, #fde8ee 58%, #f1e9fa 100%); }
+        .gs-story1::before { content: ""; position: absolute; width: 480px; height: 480px; border-radius: 50%; top: -160px; right: -120px; background: radial-gradient(circle, rgba(245,216,122,0.38), rgba(245,216,122,0) 70%); pointer-events: none; }
+        .gs-arch-wrap { position: relative; width: 100%; max-width: 410px; margin: 0 auto; }
+        .gs-arch-back { position: absolute; inset: 0; transform: translate(20px, 20px); border-radius: 999px 999px 30px 30px; background: #e3d8f4; }
+        .gs-arch { position: relative; aspect-ratio: 4 / 5; border-radius: 999px 999px 30px 30px; overflow: hidden; border: 6px solid #fff; box-shadow: 0 26px 50px rgba(120,70,90,0.22); background: #f8f3f0; }
+        .gs-sticker {
+          position: absolute; top: 34px; right: -18px; z-index: 3; width: 98px; height: 98px; border-radius: 50%;
+          background: #f5d87a; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; text-align: center;
+          box-shadow: 0 12px 24px rgba(200,150,20,0.35); transform: rotate(10deg);
+        }
+        .gs-sticker span { font-size: 0.78rem; line-height: 1.2; color: #5a3d00; font-weight: 700; }
+
+        /* ── story 2: bulk orders ── */
+        .gs-story2 { background: #fdf0e9; }
+        .gs-frame-wrap { position: relative; width: 100%; }
+        .gs-frame-back { position: absolute; inset: 0; transform: translate(-18px, 18px); border-radius: 30px; background: #f8d9c4; }
+        .gs-frame { position: relative; aspect-ratio: 4 / 3; border-radius: 30px; overflow: hidden; box-shadow: 0 22px 44px rgba(120,70,40,0.18); background: #f8d9c4; }
+
+        /* ── why our gift sets ── */
+        .gs-why { background: #fffaf3; padding: 96px 0 104px; }
+        .gs-why-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .gs-why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 44px; align-items: start; }
+        .gs-why-card:nth-child(2) { margin-top: 56px; }
+        .gs-why-media { aspect-ratio: 4 / 5; overflow: hidden; margin-bottom: 1.4rem; }
+        .gs-why-img { transition: transform 0.5s ease; }
+        .gs-why-card:hover .gs-why-img { transform: scale(1.06); }
+
+        /* ── product grid ── */
+        .gs-shop { max-width: 1200px; margin: 0 auto; padding: 88px 24px 72px; scroll-margin-top: 90px; }
+        .gs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+        /* ── bottom CTA ── */
+        .gs-cta { max-width: 1200px; margin: 0 auto 80px; padding: 0 24px; }
+        .gs-cta-card {
+          position: relative; overflow: hidden; border-radius: 32px; padding: 52px 48px;
+          display: flex; align-items: center; justify-content: space-between; gap: 28px;
+          background: linear-gradient(135deg, #dc7a95 0%, #c36f9c 55%, #a77fc4 120%);
+        }
+        .gs-cta-card::before { content: ""; position: absolute; width: 380px; height: 380px; border-radius: 50%; top: -170px; right: -90px; background: radial-gradient(circle, rgba(255,255,255,0.28), rgba(255,255,255,0) 70%); pointer-events: none; }
+        .gs-cta-card::after { content: ""; position: absolute; width: 280px; height: 280px; border-radius: 50%; bottom: -150px; left: 12%; background: radial-gradient(circle, rgba(245,216,122,0.30), rgba(245,216,122,0) 70%); pointer-events: none; }
+        .gs-cta-text { position: relative; z-index: 1; }
+
+        /* ── responsive ── */
+        @media (max-width: 1024px) {
+          .gs-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 860px) {
+          .gs-wrap { flex-direction: column; gap: 52px; padding: 68px 20px; }
+          .gs-wrap-rev { flex-direction: column-reverse; }
+          .gs-lead { max-width: none; }
+          .gs-why { padding: 72px 0 80px; }
+          .gs-why-grid { grid-template-columns: 1fr; gap: 48px; }
+          .gs-why-card { max-width: 420px; width: 100%; margin: 0 auto; }
+          .gs-why-card:nth-child(2) { margin-top: 0; }
+          .gs-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+          .gs-shop { padding: 64px 20px 56px; }
+          .gs-cta-card { flex-direction: column; align-items: flex-start; padding: 40px 28px; }
+          .gs-hero { min-height: 520px; }
+          .gs-hero-inner { padding: 0 20px 44px; }
+          .gs-sticker { right: -6px; width: 88px; height: 88px; }
+          .gs-frame-back { transform: translate(-10px, 12px); }
+          .gs-arch-back { transform: translate(12px, 14px); }
+        }
       `}</style>
 
-      {/* ══════════════ FULL-BLEED HERO ══════════════ */}
-      <section
-        className="relative w-full flex items-end md:items-center"
-        style={{ height: "560px", overflow: "hidden" }}
-      >
+      {/* ══════════════ HERO — VIDEO ══════════════ */}
+      <section className="gs-hero">
+        {/* Photo sits underneath as a fallback while the video loads (or if it can't) */}
         <ImgWithFallback
           src="/images/gift-hero.jpg"
           fallback="/images/gift-hero.jpeg"
-          alt="Baby gift sets from The Little Store"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center 30%",
+          alt=""
+          className="gs-hero-media"
+        />
+        <video
+          ref={heroVideoRef}
+          className="gs-hero-media"
+          src="/images/hero_video.mp4"
+          poster="/images/gift-hero.jpeg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
           }}
         />
-        {/* Colorful gradient wash instead of plain dark overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(180deg, rgba(244,167,185,0.18) 0%, rgba(45,25,45,0.15) 45%, rgba(20,15,25,0.72) 100%)",
-          }}
-        />
+        <div className="gs-hero-shade" />
 
-        {/* Floating confetti dots for a playful, colorful touch */}
-        <ConfettiDot top="12%" left="8%" color="#f5d87a" size={16} delay="0s" />
-        <ConfettiDot top="20%" left="88%" color="#f4a7b9" size={20} delay="0.6s" />
-        <ConfettiDot top="65%" left="92%" color="#9b82c8" size={14} delay="1.1s" />
-        <ConfettiDot top="75%" left="5%" color="#7bbf8a" size={18} delay="0.3s" />
-
-        <div
-          className="gift-fade-up relative z-10 w-full max-w-[1200px] mx-auto px-6 md:px-12 pb-12 md:pb-16"
-          style={{ textAlign: "center" }}
-        >
-          <span
-            style={{
-              fontFamily: '"Nunito", sans-serif',
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color: "#f5d87a",
-              display: "inline-block",
-              marginBottom: "0.9rem",
-            }}
-          >
-            Join the Little Store Family
+        <div className="gs-hero-inner">
+          <span className="gs-hero-pill gs-rise" style={{ animationDelay: "0.1s" }}>
+            <i />
+            Join the Little Store family
           </span>
 
-          <h1
-            style={{
-              fontFamily: '"Nunito", sans-serif',
-              fontWeight: 900,
-              fontSize: "clamp(2.2rem, 5vw, 3.6rem)",
-              lineHeight: 1.15,
-              color: "#ffffff",
-              margin: "0 auto 1rem",
-              maxWidth: "760px",
-              textShadow: "0 2px 18px rgba(0,0,0,0.25)",
-            }}
-          >
-            Spread Smiles With Our{" "}
-            <span style={{ color: "#f4a7b9" }}>Gift Sets</span>
+          <h1 className="gs-serif gs-hero-h1">
+            <span className="gs-rise" style={{ display: "block", animationDelay: "0.25s" }}>
+              Spread smiles
+            </span>
+            <em className="gs-rise" style={{ display: "block", animationDelay: "0.4s" }}>
+              with our gift sets
+            </em>
           </h1>
 
-          <p
-            style={{
-              fontFamily: '"Nunito", sans-serif',
-              fontWeight: 500,
-              fontSize: "1rem",
-              color: "#fdf6f0",
-              maxWidth: "480px",
-              margin: "0 auto 2rem",
-              lineHeight: 1.7,
-            }}
-          >
+          <p className="gs-hero-p gs-rise" style={{ animationDelay: "0.6s" }}>
             Curated bundles of our softest essentials, beautifully packaged
             for baby showers, birthdays, and every little celebration.
           </p>
 
-          <button
-            className="gift-cta-btn"
-            onClick={() =>
-              document
-                .getElementById("gift-sets-grid")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-            style={{
-              fontFamily: '"Nunito", sans-serif',
-              fontWeight: 700,
-              fontSize: "0.92rem",
-              color: "#fff",
-              backgroundColor: "#f4a7b9",
-              border: "none",
-              borderRadius: "999px",
-              padding: "0.85rem 2.3rem",
-              cursor: "pointer",
-              boxShadow: "0 8px 24px rgba(244,167,185,0.55)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#e0839b";
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#f4a7b9";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
-          >
-            Shop Gift Sets
-          </button>
-        </div>
-      </section>
-
-      {/* ══════════════ STORY SECTION 1 — BIRTHDAY PARTY ENERGY ══════════════ */}
-      <section
-        className="relative"
-        style={{
-          background: "linear-gradient(135deg, #fff4d6 0%, #ffe3ec 50%, #e3f7ec 100%)",
-          overflow: "hidden",
-        }}
-      >
-        {/* Bunting flags along the top */}
-        <BuntingRow />
-
-        {/* Floating balloons + confetti around the whole section */}
-        <span className="gift-float" style={{ position: "absolute", top: "8%", left: "3%", animationDelay: "0.1s" }}>
-          <BalloonSVG color="#f4a7b9" size={46} />
-        </span>
-        <span className="gift-float" style={{ position: "absolute", top: "58%", left: "1%", animationDelay: "0.9s" }}>
-          <BalloonSVG color="#f5d87a" size={34} />
-        </span>
-        <span className="gift-float" style={{ position: "absolute", top: "14%", right: "4%", animationDelay: "0.5s" }}>
-          <BalloonSVG color="#9b82c8" size={40} />
-        </span>
-        <span className="gift-float" style={{ position: "absolute", top: "62%", right: "2%", animationDelay: "1.2s" }}>
-          <BalloonSVG color="#7bbf8a" size={30} />
-        </span>
-        <ConfettiDot top="24%" left="22%" color="#f4a7b9" size={10} delay="0.2s" />
-        <ConfettiDot top="80%" left="30%" color="#f5d87a" size={12} delay="0.7s" />
-        <ConfettiDot top="20%" left="80%" color="#7bbf8a" size={10} delay="0.4s" />
-
-        <div className="max-w-[1200px] mx-auto px-6 md:px-10 py-16 md:py-24 flex flex-col md:flex-row items-center gap-12 md:gap-16">
-          {/* ── Tilted "polaroid" photo with sticker badge ── */}
-          <div className="w-full md:w-1/2 flex justify-center">
-            <div
-              className="relative"
-              style={{ transform: "rotate(-4deg)", maxWidth: "420px", width: "100%" }}
+          <div className="gs-hero-actions gs-rise" style={{ animationDelay: "0.75s" }}>
+            <button
+              className="gs-btn gs-btn-pink gs-btn-hero"
+              onClick={() =>
+                document
+                  .getElementById("gift-sets-grid")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
             >
-              <div
-                style={{
-                  backgroundColor: "#fff",
-                  padding: "14px 14px 34px",
-                  borderRadius: "1.1rem",
-                  boxShadow: "0 20px 40px rgba(90,60,40,0.25)",
-                }}
-              >
-                <div className="rounded-[0.8rem] overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                  <ImgWithFallback
-                    src="/images/giftStory1.jpeg"
-                    fallback="/images/g.jpeg"
-                    alt="Return gift favours for kids birthday parties"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                  />
-                </div>
-              </div>
-
-              {/* Sticker badge, popped on the corner */}
-              <div
-                className="gift-float"
-                style={{
-                  position: "absolute",
-                  top: "-22px",
-                  right: "-22px",
-                  width: "92px",
-                  height: "92px",
-                  borderRadius: "50%",
-                  backgroundColor: "#ffd23f",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  transform: "rotate(9deg)",
-                  boxShadow: "0 10px 22px rgba(255,180,20,0.5)",
-                  border: "3px solid #fff",
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: '"Nunito", sans-serif',
-                    fontWeight: 900,
-                    fontSize: "0.72rem",
-                    lineHeight: 1.15,
-                    color: "#5a3d00",
-                  }}
-                >
-                  PARTY
-                  <br />
-                  FAVOURITE 🎉
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Text ── */}
-          <div className="w-full md:w-1/2">
-            <span
-              style={{
-                display: "inline-block",
-                backgroundColor: "#fff",
-                color: "#e0839b",
-                fontWeight: 800,
-                fontSize: "0.75rem",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                padding: "0.4rem 1rem",
-                borderRadius: "999px",
-                marginBottom: "1.1rem",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-              }}
-            >
-              🎈 Return Gifts
-            </span>
-
-            <h2
-              style={{
-                fontFamily: '"Nunito", sans-serif',
-                fontWeight: 900,
-                fontSize: "clamp(2rem, 3.6vw, 2.9rem)",
-                lineHeight: 1.15,
-                color: "#2d2d2d",
-                marginBottom: "1.1rem",
-              }}
-            >
-              Perfect Return Gifts
-              <br />
-              For{" "}
-              <span style={{ position: "relative", display: "inline-block", color: "#e0839b" }}>
-                Birthdays!
-                <SquiggleSVG />
-              </span>
-            </h2>
-
-            <p style={{ fontSize: "1rem", color: "#6b5f5a", lineHeight: 1.85, marginBottom: "1.8rem", maxWidth: "440px" }}>
-              Birthdays are magical — the return gifts should be too! Surprise
-              every little guest with soft, cozy sets that bring giggles,
-              compliments, and memories that last way past the party. 🎂
-            </p>
-
+              Shop gift sets
+            </button>
             <a
-              href={whatsappLink("Hi! I'm interested in your Gift Sets for a birthday return gift order.")}
+              className="gs-btn gs-btn-glass gs-btn-hero"
+              href={whatsappLink("Hi! I'd like help choosing a Gift Set.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="gift-cta-btn"
-              style={{
-                display: "inline-block",
-                fontFamily: '"Nunito", sans-serif',
-                fontWeight: 800,
-                fontSize: "0.9rem",
-                color: "#fff",
-                background: "linear-gradient(135deg, #f4a7b9, #e0839b)",
-                border: "none",
-                borderRadius: "999px",
-                padding: "0.85rem 2.1rem",
-                cursor: "pointer",
-                boxShadow: "0 10px 24px rgba(224,131,155,0.45)",
-                textDecoration: "none",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px) scale(1.03)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0) scale(1)")}
             >
-              🎉 Enquire for Party Favours
+              Chat on WhatsApp
             </a>
           </div>
         </div>
       </section>
 
-      {/* ══════════════ STORY SECTION 2 — text left, image right, peach/pink ══════════════ */}
-      <section style={{ backgroundColor: "#fdf0e9" }}>
-        <div className="max-w-[1200px] mx-auto px-6 md:px-10 py-14 md:py-20 flex flex-col md:flex-row-reverse items-center gap-10 md:gap-16">
-          <div className="w-full md:w-1/2 rounded-[1.75rem] overflow-hidden" style={{ aspectRatio: "4/3" }}>
-            <ImgWithFallback
-              src="/images/gift-story-2.jpg"
-              fallback="/images/giftStory2.jpeg"
-              alt="Bulk gift set orders for celebrations"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
+      {/* ══════════════ TRUST STRIP ══════════════ */}
+      <div className="gs-strip">
+        <div className="gs-strip-inner">
+          <StripItem
+            label="100% cotton, soft on skin"
+            path="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 17-9 17z M4 21c3-6 6-9 11-11"
+          />
+          <StripItem
+            label="Ribboned and boxed"
+            path="M20 12v9H4v-9 M2 7h20v5H2z M12 21V7 M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7z M12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"
+          />
+          <StripItem
+            label="Special pricing on bulk orders"
+            path="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z M7.5 7.5h.01"
+          />
+        </div>
+      </div>
+
+      {/* ══════════════ STORY 1 — RETURN GIFTS ══════════════ */}
+      <section className="gs-story1">
+        <div className="gs-wrap">
+          <div className="gs-col">
+            <div className="gs-arch-wrap">
+              <div className="gs-arch-back" />
+              <div className="gs-arch">
+                <ImgWithFallback
+                  src="/images/giftStory1.jpeg"
+                  fallback="/images/gift-hero.jpeg"
+                  alt="Return gift favours for kids birthday parties"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </div>
+              <div className="gs-sticker gs-float">
+                <span>
+                  Party
+                  <br />
+                  favourite
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="w-full md:w-1/2">
-            <span
-              style={{
-                display: "inline-block",
-                backgroundColor: "#f8d9c4",
-                color: "#a35a25",
-                fontWeight: 700,
-                fontSize: "0.72rem",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                padding: "0.35rem 0.9rem",
-                borderRadius: "999px",
-                marginBottom: "1rem",
-              }}
-            >
-              Bulk Orders
+
+          <div className="gs-col">
+            <span className="gs-pill" style={{ background: "#fff", color: "#b8486a", boxShadow: "0 4px 14px rgba(0,0,0,0.06)" }}>
+              Return gifts
             </span>
-            <h2
-              style={{
-                fontFamily: '"Nunito", sans-serif',
-                fontWeight: 900,
-                fontSize: "clamp(1.7rem, 3vw, 2.4rem)",
-                color: "#3a2a1f",
-                lineHeight: 1.2,
-                marginBottom: "1rem",
-              }}
-            >
-              Gift Sets For Every Celebration
+            <h2 className="gs-serif gs-h2" style={{ color: "#34252e" }}>
+              Perfect return gifts for birthdays
             </h2>
-            <p style={{ fontSize: "0.95rem", color: "#6b5a4f", lineHeight: 1.8, marginBottom: "1.6rem", maxWidth: "440px" }}>
+            <p className="gs-lead" style={{ color: "#6b5a62" }}>
+              Birthdays are magical — the return gifts should be too! Surprise
+              every little guest with soft, cozy sets that bring giggles,
+              compliments, and memories that last way past the party.
+            </p>
+            <a
+              href={whatsappLink("Hi! I'm interested in your Gift Sets for a birthday return gift order.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gs-btn gs-btn-pink"
+            >
+              Enquire for party favours
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════ STORY 2 — BULK ORDERS ══════════════ */}
+      <section className="gs-story2">
+        <div className="gs-wrap gs-wrap-rev">
+          <div className="gs-col">
+            <span className="gs-pill" style={{ background: "#f8d9c4", color: "#8a461a" }}>
+              Bulk orders
+            </span>
+            <h2 className="gs-serif gs-h2" style={{ color: "#3a2a1f" }}>
+              Gift sets for every celebration
+            </h2>
+            <p className="gs-lead" style={{ color: "#6b5a4f" }}>
               School events, baby showers, or festive get-togethers — our
               100% cotton sets are made for the moment. Ask us about special
               pricing when you order in bulk.
@@ -417,71 +391,65 @@ export default function GiftSets() {
               href={whatsappLink("Hi! I'd like to ask about bulk pricing for Gift Sets.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="gift-cta-btn"
-              style={{
-                display: "inline-block",
-                fontFamily: '"Nunito", sans-serif',
-                fontWeight: 700,
-                fontSize: "0.85rem",
-                color: "#fff",
-                backgroundColor: "#e0834a",
-                border: "none",
-                borderRadius: "999px",
-                padding: "0.75rem 1.8rem",
-                cursor: "pointer",
-                textDecoration: "none",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+              className="gs-btn gs-btn-amber"
             >
-              Ask About Bulk Pricing
+              Ask about bulk pricing
             </a>
+          </div>
+
+          <div className="gs-col" style={{ width: "100%" }}>
+            <div className="gs-frame-wrap">
+              <div className="gs-frame-back" />
+              <div className="gs-frame">
+                <ImgWithFallback
+                  src="/images/gift-story-2.jpg"
+                  fallback="/images/giftStory2.jpeg"
+                  alt="Bulk gift set orders for celebrations"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      {/* ══════════════ WHY OUR GIFT SETS — colorful photo cards ══════════════ */}
-      <section style={{ backgroundColor: "#fffaf3" }} className="py-14 md:py-20">
-        <div className="max-w-[1200px] mx-auto px-6 md:px-10">
+
+      {/* ══════════════ WHY OUR GIFT SETS ══════════════ */}
+      <section className="gs-why">
+        <div className="gs-why-inner">
           <h2
+            className="gs-serif"
             style={{
-              fontFamily: '"Nunito", sans-serif',
-              fontWeight: 900,
-              fontSize: "clamp(1.8rem, 3.2vw, 2.5rem)",
-              color: "#2d2d2d",
+              fontSize: "clamp(2rem, 3.6vw, 2.8rem)",
+              color: "#34252e",
               textAlign: "center",
-              marginBottom: "2.5rem",
+              margin: "0 0 3.2rem",
             }}
           >
-            Why Our Gift Sets?
+            Why our gift sets?
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {WHY_CARDS.map((c) => (
-              <div key={c.title} className="gift-why-card">
+          <div className="gs-why-grid">
+            {WHY_CARDS.map((c, i) => (
+              <div key={c.title} className="gs-why-card">
                 <div
-                  className="rounded-[1.5rem] overflow-hidden mb-4"
-                  style={{ aspectRatio: "4/3", backgroundColor: c.tint }}
+                  className="gs-why-media"
+                  style={{ backgroundColor: c.tint, borderRadius: WHY_SHAPES[i % WHY_SHAPES.length] }}
                 >
                   <ImgWithFallback
                     src={c.img}
                     fallback={c.fallback}
                     alt={c.title}
-                    className="gift-why-img"
+                    className="gs-why-img"
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                 </div>
                 <h3
-                  style={{
-                    fontFamily: '"Nunito", sans-serif',
-                    fontWeight: 800,
-                    fontSize: "1.05rem",
-                    color: c.accent,
-                    marginBottom: "0.5rem",
-                  }}
+                  className="gs-serif"
+                  style={{ fontSize: "1.3rem", color: c.accent, margin: "0 0 0.5rem" }}
                 >
                   {c.title}
                 </h3>
-                <p style={{ fontSize: "0.88rem", color: "#7a6f6a", lineHeight: 1.7 }}>
+                <p style={{ fontSize: "0.95rem", color: "#6f6168", lineHeight: 1.75, margin: 0 }}>
                   {c.body}
                 </p>
               </div>
@@ -491,23 +459,25 @@ export default function GiftSets() {
       </section>
 
       {/* ══════════════ PRODUCT GRID ══════════════ */}
-      <section
-        id="gift-sets-grid"
-        className="max-w-[1200px] mx-auto px-6 md:px-10 py-14 scroll-mt-24"
-      >
+      <section id="gift-sets-grid" className="gs-shop">
         {loading ? (
-          <div className="py-16 text-center" style={{ color: "#8a7f7a" }}>
+          <div style={{ padding: "64px 0", textAlign: "center", color: "#8a7f7a", fontWeight: 600 }}>
             Loading gift sets…
           </div>
         ) : giftProducts.length === 0 ? (
           <div
-            className="py-16 text-center rounded-2xl"
-            style={{ backgroundColor: "#fdf6f0", color: "#8a7f7a" }}
+            style={{
+              padding: "64px 20px",
+              textAlign: "center",
+              borderRadius: "28px",
+              backgroundColor: "#fdf6f0",
+              color: "#8a7f7a",
+            }}
           >
-            <p style={{ fontWeight: 700, color: "#2d2d2d", marginBottom: "6px" }}>
+            <p className="gs-serif" style={{ fontSize: "1.3rem", color: "#34252e", margin: "0 0 8px" }}>
               New gift sets coming soon
             </p>
-            <p style={{ fontSize: "0.85rem" }}>
+            <p style={{ fontSize: "0.92rem", margin: 0 }}>
               We're curating something special — check back shortly.
             </p>
           </div>
@@ -516,22 +486,14 @@ export default function GiftSets() {
         )}
       </section>
 
-      {/* ══════════════ BOTTOM CTA — colorful confetti banner ══════════════ */}
-      <section className="max-w-[1200px] mx-auto px-6 md:px-10 mb-16">
-        <div
-          className="relative flex flex-col md:flex-row items-center justify-between gap-5 rounded-[1.75rem] px-8 py-10 overflow-hidden"
-          style={{ backgroundColor: "#f4a7b9" }}
-        >
-          <ConfettiDot top="15%" left="6%" color="#fff" size={10} delay="0.2s" />
-          <ConfettiDot top="70%" left="14%" color="#f5d87a" size={14} delay="0.8s" />
-          <ConfettiDot top="20%" left="92%" color="#fff" size={12} delay="0.4s" />
-          <ConfettiDot top="75%" left="88%" color="#e8e0f5" size={16} delay="1s" />
-
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <p style={{ fontWeight: 900, fontSize: "1.3rem", color: "#fff", marginBottom: "6px" }}>
+      {/* ══════════════ BOTTOM CTA ══════════════ */}
+      <section className="gs-cta">
+        <div className="gs-cta-card">
+          <div className="gs-cta-text">
+            <p className="gs-serif" style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "#fff", margin: "0 0 8px" }}>
               Can't find the perfect set?
             </p>
-            <p style={{ fontSize: "0.9rem", color: "#fff0f3" }}>
+            <p style={{ fontSize: "1rem", color: "#fff7f9", margin: 0, maxWidth: "460px", lineHeight: 1.65 }}>
               Tell us the occasion — we'll help you build a custom gift box.
             </p>
           </div>
@@ -539,28 +501,10 @@ export default function GiftSets() {
             href={whatsappLink("Hi! I couldn't find the perfect gift set — can you help me build a custom gift box?")}
             target="_blank"
             rel="noopener noreferrer"
-            className="gift-cta-btn"
-            style={{
-              position: "relative",
-              zIndex: 1,
-              display: "inline-block",
-              fontFamily: '"Nunito", sans-serif',
-              fontWeight: 700,
-              fontSize: "0.88rem",
-              color: "#e0839b",
-              backgroundColor: "#fff",
-              border: "none",
-              borderRadius: "999px",
-              padding: "0.8rem 2rem",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
-              textDecoration: "none",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+            className="gs-btn gs-btn-white"
+            style={{ position: "relative", zIndex: 1 }}
           >
-            Contact Us
+            Contact us
           </a>
         </div>
       </section>
@@ -573,25 +517,18 @@ export default function GiftSets() {
 function GiftSetsGrid({ products }) {
   return (
     <section>
-      <h2
-        style={{
-          fontFamily: '"Nunito", sans-serif',
-          fontWeight: 800,
-          fontSize: "1.4rem",
-          color: "#2d2d2d",
-          margin: "0 0 1.4rem",
-          textAlign: "center",
-        }}
-      >
-        Shop All Gift Sets
-      </h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: "14px",
-        }}
-      >
+      <div style={{ textAlign: "center", marginBottom: "2.2rem" }}>
+        <h2
+          className="gs-serif"
+          style={{ fontSize: "clamp(1.8rem, 3.2vw, 2.5rem)", color: "#34252e", margin: "0 0 6px" }}
+        >
+          Shop all gift sets
+        </h2>
+        <p style={{ fontSize: "0.95rem", color: "#8a7f7a", margin: 0, fontWeight: 600 }}>
+          {products.length} {products.length === 1 ? "set" : "sets"} to choose from
+        </p>
+      </div>
+      <div className="gs-grid">
         {products.map((p) => (
           <ProductCard
             key={p._id}
@@ -600,6 +537,29 @@ function GiftSetsGrid({ products }) {
         ))}
       </div>
     </section>
+  );
+}
+
+/* ───────────── Trust strip item ───────────── */
+
+function StripItem({ label, path }) {
+  return (
+    <div className="gs-strip-item">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#c9627e"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d={path} />
+      </svg>
+      <span>{label}</span>
+    </div>
   );
 }
 
@@ -615,94 +575,6 @@ function ImgWithFallback({ src, fallback, alt, style, className }) {
       className={className}
       onError={() => {
         if (current !== fallback) setCurrent(fallback);
-      }}
-    />
-  );
-}
-
-/* ───────────── Birthday bunting row ───────────── */
-
-function BuntingRow() {
-  const colors = ["#f4a7b9", "#f5d87a", "#9b82c8", "#7bbf8a", "#f4a7b9", "#f5d87a", "#9b82c8", "#7bbf8a"];
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "6px",
-        paddingTop: "14px",
-        position: "relative",
-        zIndex: 1,
-      }}
-    >
-      {colors.map((c, i) => (
-        <svg key={i} width="26" height="30" viewBox="0 0 26 30" style={{ transform: `rotate(${(i % 2 === 0 ? -4 : 4)}deg)` }}>
-          <path d="M2 0 H24 L13 28 Z" fill={c} />
-        </svg>
-      ))}
-    </div>
-  );
-}
-
-/* ───────────── Balloon ───────────── */
-
-function BalloonSVG({ color = "#f4a7b9", size = 40 }) {
-  return (
-    <svg width={size} height={size * 1.5} viewBox="0 0 40 60" fill="none">
-      <ellipse cx="20" cy="22" rx="18" ry="21" fill={color} />
-      <path d="M20 43 L23 48 L18 48 Z" fill={color} />
-      <path
-        d="M20 48 C20 48 14 54 20 60"
-        stroke={color}
-        strokeWidth="1.5"
-        fill="none"
-        opacity="0.7"
-      />
-      <ellipse cx="14" cy="14" rx="4" ry="6" fill="#ffffff" opacity="0.35" />
-    </svg>
-  );
-}
-
-/* ───────────── Squiggle underline ───────────── */
-
-function SquiggleSVG() {
-  return (
-    <svg
-      width="100%"
-      height="10"
-      viewBox="0 0 140 10"
-      preserveAspectRatio="none"
-      style={{ position: "absolute", left: 0, bottom: "-8px" }}
-    >
-      <path
-        d="M2 6 C 20 -2, 40 12, 60 6 S 100 -2, 138 6"
-        stroke="#f5d87a"
-        strokeWidth="3.5"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-/* ───────────── Floating confetti dot ───────────── */
-
-function ConfettiDot({ top, left, color, size = 14, delay = "0s" }) {
-  return (
-    <span
-      className="gift-float"
-      style={{
-        position: "absolute",
-        top,
-        left,
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius: "50%",
-        backgroundColor: color,
-        opacity: 0.85,
-        zIndex: 2,
-        animationDelay: delay,
-        pointerEvents: "none",
       }}
     />
   );
