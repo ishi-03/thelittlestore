@@ -513,6 +513,23 @@ const Products = () => {
                   {/* Category */}
                   <td className="p-4 text-gray-600">
                     {product.category}
+
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {(product.placements?.length ? product.placements : ["global"]).map(
+                        (placement) => (
+                          <span
+                            key={placement}
+                            className="text-[10px] px-2 py-0.5 rounded-full bg-pink-50 text-pink-500"
+                          >
+                            {placement === "women-wear"
+                              ? "Women Wear"
+                              : placement === "twinning"
+                              ? "Twinning"
+                              : "Global"}
+                          </span>
+                        )
+                      )}
+                    </div>
                   </td>
 
                   {/* Price */}

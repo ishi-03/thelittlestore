@@ -31,8 +31,8 @@ export default function ContactPage() {
       a: "Most orders are dispatched within 1–2 business days and delivered within 4–6 business days across India.",
     },
     {
-      q: "Can I exchange a size?",
-      a: "Yes! We accept size exchanges within 7 days of delivery, provided the item is unwashed and unused.",
+      q: "Do you accept returns or exchanges?",
+      a: "No — all sales are final and we do not offer returns, size exchanges or refunds. Please check our Size Guide carefully before ordering.",
     },
     {
       q: "Are your fabrics safe for newborns?",
@@ -230,7 +230,7 @@ export default function ContactPage() {
                       <option value="">Select a topic</option>
                       <option>Order & Delivery</option>
                       <option>Size Guidance</option>
-                      <option>Returns & Exchanges</option>
+                      <option>Order Support</option>
                       <option>Gifting & Bulk Orders</option>
                       <option>Product Question</option>
                       <option>Something else</option>
@@ -292,7 +292,7 @@ export default function ContactPage() {
           the little store <Heart className="w-4 h-4 fill-[#F9A8B8] text-[#F9A8B8]" />
         </div>
         <p className="text-xs tracking-widest uppercase mb-3">Cozy Nights. Happy Babies.</p>
-        <p className="text-xs">© 2025 The Little Store. Made with love in Mumbai.</p>
+        <p className="text-xs">© {new Date().getFullYear()} The Little Store. Made with love in Mumbai.</p>
       </footer>
     </div>
   );

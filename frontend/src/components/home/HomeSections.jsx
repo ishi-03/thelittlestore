@@ -206,7 +206,7 @@ export function HomeHero() {
 const MARQUEE_ITEMS = [
   "100% soft cotton",
   "Ribboned & gift-boxed",
-  "Easy 7-day size exchange",
+  "Size guide on every product",
   "Gentle on little skin",
   "Delivered across India",
   "Made for cozy nights",

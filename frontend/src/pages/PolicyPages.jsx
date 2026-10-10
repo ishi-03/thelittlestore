@@ -70,7 +70,7 @@ const PRIVACY = {
     {
       title: "Data security and retention",
       body: [
-        "We take reasonable steps to keep your information safe. No online system is completely risk-free, so we cannot guarantee absolute security. We keep order records for as long as needed to fulfil your order, handle returns and meet our accounting and legal obligations.",
+        "We take reasonable steps to keep your information safe. No online system is completely risk-free, so we cannot guarantee absolute security. We keep order records for as long as needed to fulfil your order, handle queries and meet our accounting and legal obligations.",
       ],
     },
     {
@@ -108,7 +108,7 @@ const TERMS = {
     {
       title: "Products and sizes",
       body: [
-        "We try to show colours, images and descriptions as accurately as possible, but screens differ, so slight variations may occur. Please check our Size Guide before ordering. All sizes are measured in cm and may vary slightly because our garments are handmade or cut by hand.",
+        "We try to show colours, images and descriptions as accurately as possible, but screens differ, so slight variations may occur. Please check our Size Guide before ordering, as we do not offer size exchanges. All sizes are measured in cm and may vary slightly.",
       ],
     },
     {
@@ -131,7 +131,7 @@ const TERMS = {
     {
       title: "Shipping, returns and refunds",
       body: [
-        "Delivery is covered by our Shipping Policy, and exchanges, cancellations and refunds are covered by our Refund, Return & Cancellation Policy. Both form part of these terms.",
+        "Delivery is covered by our Shipping Policy. Our no-returns, no-exchange and no-refund rules, along with cancellations, are in our Refund, Return & Cancellation Policy. Both form part of these terms.",
       ],
     },
     {
@@ -164,52 +164,54 @@ const TERMS = {
 const REFUND = {
   eyebrow: "Help",
   title: "Refund, Return & Cancellation Policy",
-  intro: "We want you and your little one to love what you ordered. Here is how exchanges, cancellations and refunds work.",
+  intro: "Please read this carefully before placing an order. All of our products are made with care, and all sales are final.",
   sections: [
     {
-      title: "Size exchanges",
+      title: "No returns, exchanges or refunds",
       body: [
-        "We accept size exchanges within 7 days of delivery, provided the item is unwashed, unused and has its tags and packaging intact. To start an exchange, message us on WhatsApp or email us with your order number and the size you need.",
-        "The exchange is subject to stock availability in the new size. Shipping for an exchange is paid by the customer unless the item was sent wrongly by us.",
+        "We do not accept returns, exchanges (including size exchanges) or refunds on any order once it has been placed and paid for. This applies to all products, including gift sets.",
       ],
     },
     {
-      title: "Damaged, defective or wrong items",
+      title: "Before you order",
       body: [
-        "If your order arrives damaged, defective or different from what you ordered, please contact us within 48 hours of delivery with your order number and clear photos (an unboxing video helps). We will arrange a replacement or a refund at no extra cost to you.",
-      ],
-    },
-    {
-      title: "Items we cannot take back",
-      body: [
+        "Because we cannot offer exchanges, please take a moment to:",
         { list: [
-          "Items that have been washed, worn or altered",
-          "Items without original tags or packaging",
-          "Customised or made-to-order gift sets and bulk orders, unless faulty",
+          "Check the Size Guide on the product page and pick the size that fits best",
+          "Review the product photos, colour and description",
+          "Double-check your delivery address, pincode and phone number",
         ] },
+        `If you are unsure about a size, message us before you order on WhatsApp at ${WHATSAPP} or email ${EMAIL} (${HOURS}) and we will happily help you choose.`,
       ],
     },
     {
-      title: "Cancelling an order",
+      title: "Cancellations",
       body: [
-        "You can cancel an order before it is dispatched. Message us on WhatsApp or email us with your order number as soon as possible. Once an order has been shipped, it cannot be cancelled, but you may still be eligible for an exchange as described above.",
+        "Once an order is placed and paid for, it cannot be cancelled by the customer.",
       ],
     },
     {
-      title: "Refunds",
+      title: "When money is returned to you",
       body: [
+        "Money is returned only in these situations, and it goes back to your original payment method, usually within 5–7 business days:",
         { list: [
-          "Approved refunds are sent to your original payment method.",
-          "Refunds usually reach you within 5–7 business days after approval. Your bank may take a little longer to show it.",
-          "If money was deducted but your order was not confirmed, the amount is automatically refunded to your account, or the order is confirmed shortly after.",
-          "Original shipping charges are not refunded, except when we are at fault.",
+          "Your payment was deducted but your order was not confirmed",
+          "You were charged more than once for the same order",
+          "We have to cancel your order ourselves, for example because an item went out of stock or we cannot deliver to your address",
         ] },
+        "Your bank may take a little longer to show the amount.",
+      ],
+    },
+    {
+      title: "Damaged or wrong items",
+      body: [
+        "If your parcel arrives visibly damaged, or you receive an item that is different from what you ordered, please contact us within 48 hours of delivery with your order number and clear photos (an unboxing video helps). We will review each case and get back to you.",
       ],
     },
     {
       title: "How to reach us",
       body: [
-        `Email ${EMAIL} or WhatsApp ${WHATSAPP} (${HOURS}). Please keep your order number handy — you can also check your order status on our Track Order page.`,
+        `Email ${EMAIL} or WhatsApp ${WHATSAPP} (${HOURS}). You can also check your order status on our Track Order page.`,
       ],
     },
   ],
@@ -257,7 +259,7 @@ const SHIPPING = {
     {
       title: "Damaged in transit",
       body: [
-        "If your parcel looks tampered with or damaged when it arrives, please take photos before opening it and contact us within 48 hours. See our Refund, Return & Cancellation Policy for what we will do.",
+        "If your parcel looks tampered with or damaged when it arrives, please take photos before opening it and contact us within 48 hours. See our Refund, Return & Cancellation Policy for details.",
       ],
     },
     {

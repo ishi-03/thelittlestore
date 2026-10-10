@@ -20,8 +20,8 @@ export default function TopBar() {
       </svg>
 
       <p className="text-xs text-[#6b6b6b] tracking-wide">
-        Free Shipping on orders above{' '}
-        <strong className="font-semibold text-pink-dark">₹xxx</strong>
+        Premium cotton nightsuits ·{' '}
+        <strong className="font-semibold text-pink-dark">Delivered across India</strong>
       </p>
     </div>
   );

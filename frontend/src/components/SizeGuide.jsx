@@ -56,7 +56,7 @@ export function SizeGuideTable() {
   return (
     <div>
       <p style={{ fontSize: "12.5px", color: MUTED, margin: "0 0 8px" }}>
-        Nightsuit measurements · all sizes in cm
+        Nightsuit measurements · all sizes in cm. Please choose carefully — we do not offer size exchanges.
       </p>
       <div style={{ overflowX: "auto", border: `1px solid ${BORDER}`, borderRadius: "10px" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: '"Nunito", sans-serif' }}>

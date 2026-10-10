@@ -19,8 +19,8 @@ export default function AboutPage() {
     },
     {
       icon: <Truck className="w-6 h-6" />,
-      title: "Free Shipping Over ₹xxx",
-      desc: "Because a cozy night's sleep shouldn't come with delivery anxiety. Free shipping on all orders above ₹xxx.",
+      title: "Delivered Across India",
+      desc: "Because a cozy night's sleep shouldn't come with delivery anxiety. We pack with care and ship to every corner of India.",
     },
   ];
 
@@ -192,7 +192,7 @@ export default function AboutPage() {
           the little store <Heart className="w-4 h-4 fill-[#F9A8B8] text-[#F9A8B8]" />
         </div>
         <p className="text-xs tracking-widest uppercase mb-3">Cozy Nights. Happy Babies.</p>
-        <p className="text-xs">© 2025 The Little Store. Made with love in Mumbai.</p>
+        <p className="text-xs">© {new Date().getFullYear()} The Little Store. Made with love in Mumbai.</p>
       </footer>
     </div>
   );

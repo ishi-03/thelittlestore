@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getProductById } from "../api/productApi.js";
 import { useCart } from "../context/CartContext.jsx";
 import { useFavorites } from "../context/FavoritesContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import { SizeGuideTable } from "../components/SizeGuide.jsx";
 
 const PINK = "#f4a7b9";
@@ -67,6 +68,7 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const { addItem } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const toast = useToast();
 
   useEffect(() => {
     setLoading(true);
@@ -129,6 +131,39 @@ export default function ProductDetail() {
   const inStock = selectedVariant ? selectedVariant.stock > 0 : true;
   const stockCount = selectedVariant?.stock;
   const handleAddToCart = () => addItem(product, selectedVariant, qty);
+  // BUY IT NOW: add this item, then go straight to checkout
+  const handleBuyNow = () => {
+    if (addItem(product, selectedVariant, qty)) navigate("/checkout");
+  };
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const handleShare = async (label) => {
+    const text = `${product.name} — The Little Store`;
+    if (label === "Tweet") {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (label === "Pin it") {
+      window.open(
+        `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${encodeURIComponent(
+          new URL(images[0], shareUrl).href
+        )}&description=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+      return;
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: product.name, text, url: shareUrl });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.show("Link copied!", "success");
+      }
+    } catch {
+      /* share dialog dismissed */
+    }
+  };
   const wished = isFavorite(product._id);
 
   return (
@@ -273,6 +308,9 @@ export default function ProductDetail() {
                   </button>
                 ))}
               </div>
+              <p style={{ fontSize: "12px", color: MUTED, margin: "10px 0 0" }}>
+                No returns or exchanges — please check the Size Guide below before ordering.
+              </p>
             </div>
           )}
 
@@ -314,6 +352,7 @@ export default function ProductDetail() {
 
           <button
             disabled={!inStock}
+            onClick={handleBuyNow}
             style={{
               width: "100%",
               background: inStock ? PINK : "#f2d9df",
@@ -336,7 +375,7 @@ export default function ProductDetail() {
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "16px 0", borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, marginBottom: "6px" }}>
             {[
               "Eco Friendly Packaging",
-              "Free Shipping in India on Orders Over ₹999",
+              "Delivered Across India",
               "10,000+ Happy Customers",
               "Flexible & Secure Payment",
             ].map((item) => (
@@ -356,7 +395,7 @@ export default function ProductDetail() {
               <SizeGuideTable />
             </Accordion>
             <Accordion title="Shipping Information">
-              Orders are processed within 1-2 business days. Free shipping across India on orders over ₹999.
+              Orders are processed within 1-2 business days. Shipping is calculated at checkout based on your location and order weight.
             </Accordion>
             <Accordion title="Wash Care">
               Machine or hand wash in cold water. Do not bleach. Tumble dry low.
@@ -368,6 +407,7 @@ export default function ProductDetail() {
             {["Share", "Tweet", "Pin it"].map((label) => (
               <button
                 key={label}
+                onClick={() => handleShare(label)}
                 style={{
                   background: "none",
                   border: "none",

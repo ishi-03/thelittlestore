@@ -12,6 +12,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import newsletterRoutes from "./routes/newsletterRoutes.js";
 import { razorpayWebhook } from "./controllers/paymentController.js";
 
 dotenv.config();
@@ -55,6 +56,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", dashboardRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend Running");

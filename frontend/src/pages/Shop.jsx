@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { getProducts } from "../api/productApi.js";
 import FilterSidebar from "../components/home/FilterSidebar.jsx";
 import HeroBanner from "../components/home/HeroBanner.jsx";
@@ -62,6 +63,8 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const searchTerm = (searchParams.get("q") || "").trim().toLowerCase();
 
   useEffect(() => {
     getProducts("global")
@@ -103,7 +106,13 @@ export default function Shop() {
       const colorMatch =
         filters.colors.length === 0 || filters.colors.includes(p.color);
 
-      return categoryMatch && ageMatch && colorMatch;
+      const searchMatch =
+        !searchTerm ||
+        [p.name, p.category, p.color, p.description].some((v) =>
+          String(v || "").toLowerCase().includes(searchTerm)
+        );
+
+      return categoryMatch && ageMatch && colorMatch && searchMatch;
     })
     .sort((a, b) => {
       if (sort === "price_asc") return a.price - b.price;
@@ -190,6 +199,12 @@ export default function Shop() {
               All Products
             </h3>
             <div style={{ width: "40px", height: "3px", background: "#f4a7b9", borderRadius: "2px" }} />
+            {searchTerm && (
+              <p style={{ margin: "10px 0 0", fontSize: "13.5px", color: "#8a7f7a", fontFamily: '"Nunito", sans-serif' }}>
+                Showing results for <strong style={{ color: "#2d2d2d" }}>"{searchParams.get("q")}"</strong>{" "}
+                <Link to="/shop" style={{ color: "#c9627e", fontWeight: 700, textDecoration: "none" }}>Clear</Link>
+              </p>
+            )}
           </div>
 
           <SortBar

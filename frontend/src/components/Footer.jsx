@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SizeGuideModal from './SizeGuide.jsx';
+import { subscribeNewsletter } from '../api/newsletterApi.js';
 
 /**
  * Footer — "The Little Store"
@@ -32,17 +33,39 @@ const POLICY_LINKS = [
   { label: 'Shipping Policy',     to: '/shipping-policy' },
 ];
 
-const SOCIALS = ['Instagram', 'Pinterest', 'Facebook'];
+const SOCIALS = [{ label: 'Instagram', href: 'https://www.instagram.com/thelittlestore_kids' }];
 
 const TRUST = [
   '100% soft cotton',
   'Ribboned & gift-boxed',
-  'Free shipping over ₹999',
+  'Delivered across India',
   'Secure payments',
 ];
 
 export default function Footer() {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [newsStatus, setNewsStatus] = useState({ type: '', text: '' });
+  const [joining, setJoining] = useState(false);
+
+  const handleJoin = async (e) => {
+    e.preventDefault();
+    if (joining) return;
+    setJoining(true);
+    setNewsStatus({ type: '', text: '' });
+    try {
+      const data = await subscribeNewsletter(email);
+      setNewsStatus({ type: 'ok', text: data.message });
+      setEmail('');
+    } catch (err) {
+      setNewsStatus({
+        type: 'err',
+        text: err?.response?.data?.message || 'Something went wrong. Please try again.',
+      });
+    } finally {
+      setJoining(false);
+    }
+  };
 
   return (
     <footer className="ft-root">
@@ -63,10 +86,14 @@ export default function Footer() {
           background: radial-gradient(circle, rgba(255,255,255,0.28), rgba(255,255,255,0) 70%); pointer-events: none; }
         .ft-news::after { content: ""; position: absolute; width: 240px; height: 240px; border-radius: 50%; bottom: -130px; left: 10%;
           background: radial-gradient(circle, rgba(245,216,122,0.30), rgba(245,216,122,0) 70%); pointer-events: none; }
-        .ft-news-text, .ft-news-form { position: relative; z-index: 1; }
+        .ft-news-text, .ft-news-right { position: relative; z-index: 1; }
+        .ft-news-right { width: 100%; max-width: 400px; }
+        .ft-news-msg { margin: 10px 0 0 14px; font-size: 0.82rem; font-weight: 700; color: #fff; }
+        .ft-news-msg.ft-err { color: #fff3c4; }
+        .ft-join:disabled { opacity: 0.7; cursor: default; }
         .ft-news-title { font-size: clamp(1.4rem, 2.6vw, 1.9rem); color: #fff; margin: 0 0 6px; }
         .ft-news-sub { font-size: 0.92rem; color: #fff3f6; margin: 0; line-height: 1.6; }
-        .ft-news-form { display: flex; gap: 8px; width: 100%; max-width: 400px; padding: 6px; border-radius: 999px;
+        .ft-news-form { display: flex; gap: 8px; width: 100%; padding: 6px; border-radius: 999px;
           background: rgba(255,255,255,0.95); box-shadow: 0 8px 20px rgba(58,43,52,0.15); }
         .ft-input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; padding: 0 14px;
           font-family: "Nunito", sans-serif; font-size: 0.88rem; color: #3a2b34; }
@@ -108,7 +135,7 @@ export default function Footer() {
 
         @media (max-width: 860px) {
           .ft-news { flex-direction: column; align-items: flex-start; padding: 32px 24px; margin-top: -36px; }
-          .ft-news-form { max-width: none; }
+          .ft-news-right { max-width: none; }
           .ft-grid { grid-template-columns: 1fr 1fr; gap: 40px 28px; padding: 48px 0 36px; }
           .ft-brandcol { grid-column: 1 / -1; }
           .ft-bottom { justify-content: center; text-align: center; }
@@ -125,9 +152,24 @@ export default function Footer() {
             <p className="ft-serif ft-news-title">Join the little circle</p>
             <p className="ft-news-sub">New arrivals &amp; baby sleep tips, straight to your inbox.</p>
           </div>
-          <div className="ft-news-form">
-            <input type="email" placeholder="your@email.com" aria-label="Email address" className="ft-input" />
-            <button type="button" className="ft-join">Join</button>
+          <div className="ft-news-right">
+            <form className="ft-news-form" onSubmit={handleJoin}>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                aria-label="Email address"
+                className="ft-input"
+              />
+              <button type="submit" className="ft-join" disabled={joining}>
+                {joining ? '…' : 'Join'}
+              </button>
+            </form>
+            {newsStatus.text && (
+              <p className={`ft-news-msg ${newsStatus.type === 'err' ? 'ft-err' : ''}`}>{newsStatus.text}</p>
+            )}
           </div>
         </div>
 
@@ -138,7 +180,7 @@ export default function Footer() {
             <p className="ft-tag">Cozy nights for little ones, since 2020. Soft, skin-friendly cotton made for tiny dreamers.</p>
             <div className="ft-chips">
               {SOCIALS.map((s) => (
-                <a key={s} href="#" className="ft-chip">{s}</a>
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="ft-chip">{s.label}</a>
               ))}
             </div>
             <a
@@ -201,8 +243,17 @@ export default function Footer() {
         {/* ── Bottom bar ────────────────────────── */}
         <div className="ft-bottom">
           <span>© {new Date().getFullYear()} The Little Store. All rights reserved.</span>
-          <b>Made with ♡ for tiny dreamers</b>
-        </div>
+<p>
+  Made with ♡ by{" "}
+  <a
+    href="https://www.blainfotech.com/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="font-bold hover:underline"
+  >
+    BLA Infotech
+  </a>
+</p>        </div>
       </div>
 
       <SizeGuideModal open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />

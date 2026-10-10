@@ -39,6 +39,17 @@ export default function Navbar() {
   const { count: favCount } = useFavorites();
   const isAdmin = useIsAdmin();
   const [userMenu, setUserMenu] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const submitSearch = (e) => {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    navigate(`/shop?q=${encodeURIComponent(q)}`);
+    setSearchOpen(false);
+    setMenuOpen(false);
+  };
 
   const logout = () => {
     adminLogout();
@@ -58,15 +69,6 @@ export default function Navbar() {
       className="sticky top-0 z-50"
       style={{ fontFamily: '"Nunito", sans-serif' }}
     >
-      {/* ── Announcement bar ─────────────────────────── */}
-      <div
-        className="flex items-center justify-center gap-2 py-2 text-[12px] text-[#5a5a5a]"
-        style={{ backgroundColor: '#fde8ee' }}
-      >
-        <TruckIcon />
-       
-      </div>
-
       {/* ── Main navbar ──────────────────────────────── */}
       <div
         className="grid grid-cols-[1fr_auto_1fr] items-center px-3 sm:px-8 md:px-12 h-[72px]"
@@ -193,11 +195,9 @@ export default function Navbar() {
           </nav>
 
           {/* Search */}
-          <div className="hidden md:block">
-            <IconBtn>
-              <SearchIcon />
-            </IconBtn>
-          </div>
+          <IconBtn label="Search" onClick={() => setSearchOpen((o) => !o)}>
+            <SearchIcon />
+          </IconBtn>
           {/* User: guests go to admin login, admins get Admin Panel / Logout */}
           <div className="relative">
             <IconBtn
@@ -268,6 +268,55 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* ── Search bar ───────────────────────────────── */}
+      {searchOpen && (
+        <form
+          onSubmit={submitSearch}
+          style={{
+            display: 'flex',
+            gap: '10px',
+            padding: '12px 16px',
+            background: '#fff',
+            borderBottom: '1px solid #f0e8e0',
+          }}
+        >
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search nightsuits, colours, categories…"
+            aria-label="Search products"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              border: '1px solid #e8ddd5',
+              borderRadius: '999px',
+              padding: '10px 18px',
+              fontSize: '14px',
+              background: '#fdf6f0',
+              outline: 'none',
+              fontFamily: '"Nunito", sans-serif',
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              border: 'none',
+              borderRadius: '999px',
+              padding: '10px 22px',
+              fontWeight: 800,
+              fontSize: '13px',
+              color: '#fff',
+              background: '#c9627e',
+              cursor: 'pointer',
+              fontFamily: '"Nunito", sans-serif',
+            }}
+          >
+            Search
+          </button>
+        </form>
+      )}
 
       {/* ── Mobile drawer ────────────────────────────── */}
       {menuOpen && (
